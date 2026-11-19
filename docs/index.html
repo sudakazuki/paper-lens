@@ -19,6 +19,21 @@
     <ul class="article-list">
       <li class="article-card">
         <figure class="article-card__thumb">
+          <a href="articles/2026-11-17-2611.23229-ambient-llms-data-efficient-sft-temperature-matching.html">
+            <img src="assets/2026-11-17-2611.23229-ambient-llms-data-efficient-sft-temperature-matching-cover.png"
+                 alt="「Ambient SFT — 高温で平滑化した『元のモデル』に寄り添わせて、少量データでも忘れない微調整」を 4 つの区画で示すインフォグラフィック。1「課題」は「少量データの SFT → 過学習・破滅的忘却」を示す。2「手法」は凍結した微調整前モデル（教師）と学習するモデル（生徒）の出力分布をそれぞれ温度 T で平滑化して KL で近づける図と、「損失 = SFT 損失 + λ × Temperature Matching 損失」の式を示す。3「温度 T の役割」は「T → ∞：通常の SFT」「T = 1：知識蒸留」「中間の T が良い」と示す。4「結果」は Qwen3-1.7B の指示チューニングで通常 SFT 比 +20.3%、ニュースへのドメイン適応で検証損失 1.99 → 1.68、計算コスト約 1.1 倍を並べる。">
+          </a>
+        </figure>
+        <div class="article-card__body">
+          <p class="article-card__date">2026-11-17</p>
+          <h2 class="article-card__title">
+            <a href="articles/2026-11-17-2611.23229-ambient-llms-data-efficient-sft-temperature-matching.html">少ないデータで微調整しても「元のモデル」を忘れない — 高温で平滑化した自分自身に寄り添わせる Ambient SFT</a>
+          </h2>
+          <p class="article-card__summary">大規模言語モデル（LLM）を少量のデータで教師あり微調整（SFT: Supervised Fine-Tuning）すると、過学習や、事前学習で得た知識を失う破滅的忘却が起こりがちです。本論文は、微調整前のモデルを凍結して「ノイズの多い教師」とみなし、温度を上げて平滑化した次トークン分布どうしを一致させる正則化項（Temperature Matching）を SFT の損失に加える「Ambient SFT」を提案しました。ドメイン適応・指示チューニング・推論の 3 つの設定で、通常の SFT を上回る結果が報告されています。追加の計算コストは、実験設定で同じステップ数あたり約 1.1 倍にとどまります。</p>
+        </div>
+      </li>
+      <li class="article-card">
+        <figure class="article-card__thumb">
           <a href="articles/2026-07-30-2607.28623-pac-man-perception-aware-cbf-rl-dodgeball.html">
             <img src="assets/2026-07-30-2607.28623-pac-man-perception-aware-cbf-rl-dodgeball-cover.png"
                  alt="「見えた分しか避けられない — 頭部カメラだけでドッジボールを避ける PAC-MAN」を 4 つの区画で示すインフォグラフィック。左上の「入力」は、人型ロボットの頭部から広がる視野の扇形と飛んでくるオレンジ色のボールを描き、「深度映像 + 関節センサ」「ボールの真の位置は使わない」と示す。右上の「2 つのバリア設計」は「Link-CBF 学習報酬のみ」「Joint-CBF 関節速度への射影」の 2 帯を並べる。左下は固定カメラ・Deployment のシミュレーション成功率を No barrier 86、Link-CBF 89、Joint-CBF 76 の棒グラフで示す。右下は「実機 Unitree G1 95%」と「20 球中 19 球を回避」「被弾 1 球」「転倒 0」を示す。最下段の帯は「安全構造の強さは、使える情報量に見合わせる」。">

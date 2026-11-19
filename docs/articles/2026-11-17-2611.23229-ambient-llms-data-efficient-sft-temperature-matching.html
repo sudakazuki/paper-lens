@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>少ないデータで微調整しても「元のモデル」を忘れない — 高温で平滑化した自分自身に寄り添わせる Ambient SFT — paper-lens</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <p class="site-header__title"><a href="../index.html">paper-lens</a></p>
+    </div>
+  </header>
+
+  <main class="article">
+    <figure class="article__cover">
+      <img src="../assets/2026-11-17-2611.23229-ambient-llms-data-efficient-sft-temperature-matching-cover.png"
+           alt="「Ambient SFT — 高温で平滑化した『元のモデル』に寄り添わせて、少量データでも忘れない微調整」を、課題・手法・温度 T の役割・結果の 4 区画で示すインフォグラフィック。結果区画には、指示チューニングでの平均相対改善 +20.3%、ニュースへのドメイン適応での検証損失 1.99 → 1.68、計算コスト約 1.1 倍の 3 つの数値を並べる。">
+    </figure>
+
+    <h1 class="article__title">少ないデータで微調整しても「元のモデル」を忘れない — 高温で平滑化した自分自身に寄り添わせる Ambient SFT</h1>
+    <div class="article__meta">
+      <span>公開日：2026-11-17</span>
+      <span>arXiv：2611.23229</span>
+      <span>カテゴリ：cs.LG / cs.AI / cs.CL</span>
+    </div>
+
+    <div class="article__body">
+
+      <h2>この論文のひとことまとめ</h2>
+      <p>大規模言語モデル（LLM）を少量のデータで教師あり微調整（SFT: Supervised Fine-Tuning）すると、過学習や、事前学習で得た知識を失う破滅的忘却が起こりがちです。本論文は、微調整前のモデルを凍結して「ノイズの多い教師」とみなし、温度を上げて平滑化した次トークン分布どうしを一致させる正則化項（Temperature Matching）を SFT の損失に加える「Ambient SFT」を提案しました。ドメイン適応・指示チューニング・推論の 3 つの設定で、通常の SFT を上回る結果が報告されています。追加の計算コストは、実験設定で同じステップ数あたり約 1.1 倍にとどまります。</p>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <p class="stat__value">+20.3%</p>
+          <p class="stat__label">指示チューニング（Qwen3-1.7B）での、通常 SFT に対する平均相対改善</p>
+        </div>
+        <div class="stat">
+          <p class="stat__value">26.7%</p>
+          <p class="stat__label">ニュースへのドメイン適応で、最良ベースラインに対するパープレキシティの改善（検証損失 1.99 → 1.68）</p>
+        </div>
+        <div class="stat">
+          <p class="stat__value">約 1.1 倍</p>
+          <p class="stat__label">同じステップ数あたりの計算コスト（通常の微調整比、実験設定）</p>
+        </div>
+      </div>
+
+      <h2>なぜこの研究が重要か</h2>
+      <p>LLM の開発は、大量のテキストで行う事前学習のあとに、指示チューニングや推論能力の付与などの事後学習（post-training）を重ねる多段の流れで進みます。事前学習は数兆トークン規模のデータを使いますが、後段では数千件程度の厳選データに頼ることが多く、段階が進むほど使えるデータが桁違いに減ります。</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <p class="card__title"><span class="badge">事前学習</span> 数兆トークン規模</p>
+          <p>大量のテキストで幅広い知識を身につける段階です。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge badge--accent-2">事後学習</span> 数千件程度の厳選データ</p>
+          <p>指示チューニングや推論能力の付与など。段階が進むほど使えるデータが桁違いに減ります。</p>
+        </div>
+      </div>
+
+      <p>この差が原因で、事後学習したモデルは事前学習で身につけた幅広い知識を忘れたり、少量データに偏って現れる文体や狭い視点に引きずられたりします。こうした副作用は alignment tax とも呼ばれます。現状の主な対処は、お金と計算資源をかけて事後学習データを大量に集める「力技」です。本論文は、データを増やさずにアルゴリズムの工夫で事後学習のデータ効率を高められないか、という問いに取り組んでいます。</p>
+
+      <h2>背景：何が問題だったのか</h2>
+      <p>論文が想定する状況は次のとおりです。微調整前の事前学習済みモデルは手元にありますが、その事前学習データには必ずしもアクセスできません。そして、目標とする分布（たとえば特定ドメインの文章や指示応答データ）からは、小さなデータセットしか得られません。</p>
+      <p>この状況で通常の SFT を行うと、少ないデータにモデルが過剰に合わせてしまいます。事前学習データと目標データを混ぜて学習する方法（データ混合）も考えられますが、事前学習データ自体が手に入らない場合もあります。一方、事前学習モデルそのものは「その分野についてある程度は知っている」情報源です。問題は、この不完全な情報源をどこまで信じてよいかという点にあります。</p>
+
+      <div class="callout callout--note">
+        <span class="callout__icon" aria-hidden="true">i</span>
+        <div class="callout__body">
+          <p><strong>手元にあるのは「事前学習済みモデル」と「目標分布の小さなデータセット」だけ。</strong>事前学習データには必ずしもアクセスできない、という前提です。</p>
+        </div>
+      </div>
+
+      <h2>提案手法：何をしたのか</h2>
+
+      <h3>着想：温度を上げると、モデル同士は似てくる</h3>
+      <p>まず用語を確認します。LLM は次に来るトークン（単語の断片）の確率分布を出力します。サンプリング温度（temperature）T は、この分布の「鋭さ」を調整するつまみです。T を 1 より大きくすると分布は平らになり、どのトークンも選ばれやすくなります。</p>
+      <p>著者らは次のような思考実験から出発します。高品質な事後学習済みモデル（oracle）があるものの、その出力を高温でノイズが多い形でしか観測できないとします。著者らは、サンプル数が十分あれば、こうした高温データから学習しても、本来の温度の分布から学習した場合に匹敵しうることを示しました。</p>
+      <p>実際には高温の oracle はありません。しかし温度を上げると、どんな 2 つのモデルの出力分布も互いに近づいていきます。したがって十分に高温であれば、手元にある微調整前のモデルを oracle の代わりとして使える、というのが中心となる発想です。</p>
+
+      <ol class="timeline">
+        <li class="timeline__step">
+          <p class="timeline__step-title">思考実験：高温の oracle から学ぶ</p>
+          <p>高品質な oracle の出力を高温でしか観測できなくても、サンプル数が十分あれば本来の温度の分布から学習した場合に匹敵しうる。</p>
+        </li>
+        <li class="timeline__step">
+          <p class="timeline__step-title">観察：高温ではモデル同士が近づく</p>
+          <p>温度を上げると、どんな 2 つのモデルの出力分布も互いに近づいていく。</p>
+        </li>
+        <li class="timeline__step">
+          <p class="timeline__step-title">発想：微調整前のモデルを代役にする</p>
+          <p>十分に高温であれば、手元にある微調整前のモデルを oracle の代わりとして使える。</p>
+        </li>
+      </ol>
+
+      <h3>目的関数：2 つの損失を足す</h3>
+      <p>Ambient SFT では、学習するモデル（生徒、student）を事前学習済みモデルで初期化し、同じ事前学習済みモデルのコピーを教師として凍結（frozen）します。そのうえで、同じトークン位置に 2 種類の損失を課します。</p>
+      <ul>
+        <li><strong>通常の SFT 損失（Clean Cross-entropy）</strong>: データ中の実際の次トークンを当てるための、ふつうの交差エントロピー損失です。</li>
+        <li><strong>Temperature Matching 損失</strong>: 温度 T で平滑化した教師の分布と、同じく温度 T で平滑化した生徒の分布の隔たりを KL ダイバージェンス（2 つの確率分布の違いを測る量）で測り、小さくします。</li>
+      </ul>
+
+      <figure class="diagram">
+        <svg viewBox="0 0 300 502" width="360" role="img" aria-label="Ambient SFT の損失の構成を示す図。学習データの実際の次トークンと生徒（学習するモデル）の出力の間に通常の SFT 損失（交差エントロピー）を課す。凍結した微調整前モデル（教師）と生徒の出力分布をそれぞれ温度 T で平滑化し、その間の KL ダイバージェンスを Temperature Matching 損失として課す。全体の損失は SFT 損失 + λ × Temperature Matching 損失。">
+          <defs>
+            <marker id="as-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L8,3 L0,6 z" fill="var(--color-text-muted)"></path>
+            </marker>
+            <marker id="as-arrow-accent" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L8,3 L0,6 z" fill="var(--color-accent)"></path>
+            </marker>
+          </defs>
+
+          <rect x="16" y="10" width="130" height="104" rx="8" fill="var(--color-surface)" stroke="var(--color-border)" stroke-width="1.5" stroke-dasharray="6 4"></rect>
+          <text x="81" y="38" text-anchor="middle" style="font-size:16px;font-weight:700;fill:var(--color-heading)">教師（凍結）</text>
+          <text x="81" y="62" text-anchor="middle" style="font-size:15px;fill:var(--color-text-muted)">微調整前の</text>
+          <text x="81" y="82" text-anchor="middle" style="font-size:15px;fill:var(--color-text-muted)">事前学習済み</text>
+          <text x="81" y="102" text-anchor="middle" style="font-size:15px;fill:var(--color-text-muted)">モデル</text>
+
+          <rect x="154" y="10" width="130" height="104" rx="8" fill="var(--color-accent-soft)" stroke="var(--color-accent)" stroke-width="1.5"></rect>
+          <text x="219" y="38" text-anchor="middle" style="font-size:15px;font-weight:700;fill:var(--color-heading)">生徒（学習する）</text>
+          <text x="219" y="66" text-anchor="middle" style="font-size:15px;fill:var(--color-text-muted)">事前学習済み</text>
+          <text x="219" y="90" text-anchor="middle" style="font-size:15px;fill:var(--color-text-muted)">モデルで初期化</text>
+
+          <path d="M81,114 L81,146" fill="none" stroke="var(--color-text-muted)" stroke-width="1.5" marker-end="url(#as-arrow)"></path>
+          <path d="M219,114 L219,146" fill="none" stroke="var(--color-text-muted)" stroke-width="1.5" marker-end="url(#as-arrow)"></path>
+
+          <rect x="16" y="148" width="130" height="44" rx="8" fill="var(--color-surface)" stroke="var(--color-border)" stroke-width="1.5"></rect>
+          <text x="81" y="175" text-anchor="middle" style="font-size:15px;fill:var(--color-heading)">温度 T で平滑化</text>
+          <rect x="154" y="148" width="130" height="44" rx="8" fill="var(--color-surface)" stroke="var(--color-border)" stroke-width="1.5"></rect>
+          <text x="219" y="175" text-anchor="middle" style="font-size:15px;fill:var(--color-heading)">温度 T で平滑化</text>
+
+          <path d="M81,192 L81,224" fill="none" stroke="var(--color-accent)" stroke-width="1.5" marker-end="url(#as-arrow-accent)"></path>
+          <path d="M219,192 L219,224" fill="none" stroke="var(--color-accent)" stroke-width="1.5" marker-end="url(#as-arrow-accent)"></path>
+
+          <rect x="16" y="226" width="268" height="64" rx="8" fill="var(--color-accent-soft)" stroke="var(--color-accent)" stroke-width="2"></rect>
+          <text x="150" y="253" text-anchor="middle" style="font-size:16px;font-weight:700;fill:var(--color-heading)">Temperature Matching 損失</text>
+          <text x="150" y="276" text-anchor="middle" style="font-size:15px;fill:var(--color-text-muted)">2 つの分布の KL を小さくする</text>
+
+          <path d="M284,62 L297,62 L297,341 L285,341" fill="none" stroke="var(--color-text-muted)" stroke-width="1.5" marker-end="url(#as-arrow)"></path>
+          <rect x="16" y="312" width="268" height="58" rx="8" fill="var(--color-surface)" stroke="var(--color-border)" stroke-width="1.5"></rect>
+          <text x="150" y="336" text-anchor="middle" style="font-size:16px;font-weight:700;fill:var(--color-heading)">SFT 損失</text>
+          <text x="150" y="358" text-anchor="middle" style="font-size:15px;fill:var(--color-text-muted)">データの実際の次トークンを当てる</text>
+
+          <path d="M16,258 L3,258 L3,452 L15,452" fill="none" stroke="var(--color-accent)" stroke-width="1.5" marker-end="url(#as-arrow-accent)"></path>
+          <path d="M150,370 L150,410" fill="none" stroke="var(--color-text-muted)" stroke-width="1.5" marker-end="url(#as-arrow)"></path>
+
+          <rect x="16" y="412" width="268" height="80" rx="8" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="1.5"></rect>
+          <text x="150" y="438" text-anchor="middle" style="font-size:16px;font-weight:700;fill:var(--color-heading)">全体の損失</text>
+          <text x="150" y="461" text-anchor="middle" style="font-size:15px;fill:var(--color-accent)">SFT 損失 + λ ×</text>
+          <text x="150" y="481" text-anchor="middle" style="font-size:15px;fill:var(--color-accent)">Temperature Matching 損失</text>
+        </svg>
+        <figcaption class="diagram__caption">同じトークン位置に 2 種類の損失を課す。教師は凍結され、学習されるのは生徒だけ。</figcaption>
+      </figure>
+
+      <p>全体の損失は「SFT 損失 + λ × Temperature Matching 損失」で、λ は 2 つの項の重みです。名前の由来は、破損したデータから拡散モデルを学習する Ambient Diffusion 系の研究です。本手法では、事前学習モデルの不完全な予測を一種の「破損」とみなし、高い温度でのみ信頼するという位置づけになっています。</p>
+
+      <h3>温度が「どこまで元のモデルを信じるか」を決める</h3>
+      <p>温度 T は、事前学習モデルをどの程度信頼するかを調整する役割を持ちます。両極端を考えると分かりやすくなります。</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <p class="card__title"><span class="badge">T → ∞</span> 通常の SFT に戻る</p>
+          <p>2 つの分布はどちらも平らになって KL がほぼ 0 になり、第 2 項が消えます。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge badge--accent-2">T = 1</span> 知識蒸留と同じ形</p>
+          <p>古典的な知識蒸留（Knowledge Distillation, KD）の損失と同じ形になります。</p>
+        </div>
+      </div>
+
+      <p>ただし通常の知識蒸留は「強い教師が弱い生徒を教える」構図です。本手法は逆で、教師は微調整前のモデルであり、生徒は最終的に教師を上回ることが期待されています。著者らは、T = 1 で教師に厳密に合わせると、未調整のモデルの弱点まで生徒に押しつけて性能を下げると述べています。</p>
+
+      <h3>実装と計算コスト</h3>
+      <p>実装は確率的に行います。各ステップで、確率 p_c で通常の SFT 損失だけを使い、残りの確率 1 − p_c で凍結教師の順伝播を行って Temperature Matching 損失を下げます。期待値としては λ = (1 − p_c)/p_c に相当します。</p>
+      <p>実験では通常 p_c = 0.75 とし、生徒と教師に同じモデルを使っています。この設定で、同じステップ数に対して通常の微調整より約 1.1 倍遅くなります。そのため著者らは、計算資源よりもデータが制約となる場面に向いた手法だとしています。</p>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <p class="stat__value">0.75</p>
+          <p class="stat__label"><code>p_c</code>：各ステップで通常の SFT 損失だけを使う確率（実験での通常の設定）。残りの確率で Temperature Matching 損失を下げる</p>
+        </div>
+        <div class="stat">
+          <p class="stat__value">約 1.1 倍</p>
+          <p class="stat__label">同じステップ数に対する、通常の微調整比の所要時間</p>
+        </div>
+      </div>
+
+      <h3>関連手法との違い</h3>
+      <div class="card-grid">
+        <div class="card">
+          <p class="card__title">Hinton らの蒸留（2015）</p>
+          <p>異なる温度でのマッチングは以前から試されていますが、本手法の主な違いは「事前学習モデル自身が、事後学習中の自分を監督する」点です。</p>
+        </div>
+        <div class="card">
+          <p class="card__title">Learning without Forgetting（LwF）</p>
+          <p>継続学習の手法で、新タスク用に別の出力ヘッドを持ち、温度は固定です。本手法は出力空間を共有し、温度を後述のバイアス・バリアンスの調整に使います。</p>
+        </div>
+        <div class="card">
+          <p class="card__title">強化学習（RL）でのアライメントにおける参照モデルへの KL ペナルティ</p>
+          <p>本手法は RL ではなく SFT 段階を対象とし、参照モデルの高温の分布にだけ合わせる点が異なります。</p>
+        </div>
+      </div>
+
+      <h3>理論面の裏づけ</h3>
+      <p>論文はいくつかの理論結果を示しています。</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <p class="card__title"><span class="badge">1</span> 高温データからでも元の分布は復元できる</p>
+          <p>有限の温度 T でサンプルした次トークンから学習しても、教師の分布をどの温度でも再現できる（識別可能である）ことを示しました。著者らは、高温のサンプルは意味不明な文字列に見えるのに学習信号を持つという点を、直観に反するかもしれないと述べています。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge">2</span> 温度を上げると差が縮む速さ</p>
+          <p>事後学習モデルと事前学習モデルの、温度 T で平滑化した分布の KL は、文脈ごとに T の 2 乗に反比例する速さで小さくなる、という上界が示されています。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge badge--accent-2">3</span> 最適な温度は両極端の間にある</p>
+          <p>単純化したモデル（固定特徴の対数線形モデル）のもとで、推定誤差を「教師の誤りに由来するバイアス」と「データ数に反比例するバリアンス（ばらつき）」の和として表しました。そのうえで、適切な λ と T（T ≠ 1）を選べば、通常の SFT・凍結教師そのもの・知識蒸留の 3 つをいずれも上回りうることを示しています（軽い条件のもとでの結果です）。</p>
+        </div>
+      </div>
+
+      <h2>結果：何が分かったのか</h2>
+
+      <h3>高温データだけからの学習</h3>
+      <p>まず、モデルから高温でサンプルしたデータで別のモデルを学習させる実験を行いました。GPT-2 アーキテクチャと tiny Shakespeare データセットでは、提案した目的関数が、学習時の破損（温度）が強くても比較的低い検証パープレキシティ（予測の当たりにくさの指標で、低いほど良い）を保ちました。さらに、OpenWebText で学習した GPT-2 124M から高温の合成データを生成し、その意味不明に見えるテキストだけで学習したモデルが、まともな英文を生成できたと報告しています。</p>
+
+      <h3>ドメイン適応</h3>
+      <p>OpenWebText で事前学習した 15 億パラメータ（1.5B）のモデルを、Python コード、CS 論文、生物医学テキスト、ニュース、商品レビューの 5 ドメインに適応させました。比較対象はスクラッチ学習、通常の微調整、データ混合による微調整です。検証損失（低いほど良い）は次のとおりです。</p>
+
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th scope="col">手法</th>
+            <th scope="col">Python コード</th>
+            <th scope="col">CS 論文</th>
+            <th scope="col">生物医学</th>
+            <th scope="col">ニュース</th>
+            <th scope="col">レビュー</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">対象ドメインのみでスクラッチ学習</th>
+            <td>1.50</td>
+            <td>3.04</td>
+            <td>2.66</td>
+            <td>2.63</td>
+            <td>3.37</td>
+          </tr>
+          <tr>
+            <th scope="row">事前学習モデル（微調整なし）</th>
+            <td>1.46</td>
+            <td>2.87</td>
+            <td>2.61</td>
+            <td>2.59</td>
+            <td>3.56</td>
+          </tr>
+          <tr>
+            <th scope="row">通常の微調整</th>
+            <td>0.80</td>
+            <td>2.56</td>
+            <td>2.36</td>
+            <td>2.01</td>
+            <td>2.96</td>
+          </tr>
+          <tr>
+            <th scope="row">データ混合による微調整</th>
+            <td>0.79</td>
+            <td>2.55</td>
+            <td>2.36</td>
+            <td>1.99</td>
+            <td>2.96</td>
+          </tr>
+          <tr>
+            <th scope="row">Ambient SFT</th>
+            <td><strong>0.70</strong></td>
+            <td><strong>2.54</strong></td>
+            <td><strong>2.35</strong></td>
+            <td><strong>1.68</strong></td>
+            <td><strong>2.96</strong></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>Ambient SFT は 5 ドメインすべてでベースラインと同等以上でした。とくにニュースでは、最良のベースラインに比べてパープレキシティが 26.7% 改善しています（検証損失 1.99 → 1.68）。</p>
+      <p>効果の大きさはドメインによって異なり、Python コードとニュースで大きく、ほかでは小さめでした。微調整前のモデルがそのドメインをどれだけ得意か（ゼロショット損失）と、ベースラインに対する勝ち幅の間には、5 ドメインでスピアマン順位相関 ρ = −0.90 という強い関係が見られました。つまり、事前学習モデルがもともと得意なドメインほど、教師として役に立つということです。</p>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <p class="stat__value">ρ = −0.90</p>
+          <p class="stat__label">事前学習モデルのゼロショット損失と、ベースラインに対する勝ち幅のスピアマン順位相関（5 ドメイン）</p>
+        </div>
+        <div class="stat">
+          <p class="stat__value">T = 2.5</p>
+          <p class="stat__label">Python コードで検証損失が最小になった温度。T = 1 でも高温側でもない</p>
+        </div>
+      </div>
+
+      <p>そのほかの分析結果は次のとおりです。</p>
+      <ul>
+        <li><strong>温度の効果</strong>: Python コードでは、検証損失は T = 1 から下がって T = 2.5 で最小となり、その後は上昇して頭打ちになりました。両極端のどちらも最適ではありません。</li>
+        <li><strong>生徒と教師のサイズ</strong>: 124M の小さな教師でも、より大きい 1.5B の生徒を改善でき、Python コードとニュースでは教師なしの通常微調整を上回りました。</li>
+        <li><strong>データ量</strong>: 124M モデルで Python コードの学習データを 1/3、1/10 に減らすと、Ambient SFT はデータ混合を一貫して上回り、データが少ないほど差が広がりました。著者らはこれを、理論上のバイアスはデータ数に依存せず、バリアンスは依存するという結果と整合すると述べています。</li>
+      </ul>
+
+      <h3>指示チューニング</h3>
+      <p>1.7B〜14B の Qwen3 ベースモデルを、指示データ Dolci-Instruct-SFT の約 20K 文書（全体の 1%）で微調整しました。全実行で p_c = 0.75、T = 2.5 を使っています。評価には、指示追従（IFEval）、知識（MMLU、PopQA、TriviaQA）、数学（GSM8K、MATH）、コード（HumanEval+）、一般推論（BBH）のベンチマークを用いました。</p>
+      <p>通常の SFT は指示追従を大きく改善します（例: 4B で IFEval 45.5% → 76.3%）。しかし他のベンチマークでは破滅的忘却が起き、どのモデルサイズでも、SFT 前のベースモデルが通常の SFT に 6〜7 タスクで勝っていました。</p>
+      <p>Ambient SFT の、通常 SFT に対する平均相対改善は次のとおりです。</p>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <p class="stat__value">+20.3%</p>
+          <p class="stat__label">Qwen3-1.7B</p>
+        </div>
+        <div class="stat">
+          <p class="stat__value">+8.0%</p>
+          <p class="stat__label">Qwen3-4B</p>
+        </div>
+        <div class="stat">
+          <p class="stat__value">+10.2%</p>
+          <p class="stat__label">Qwen3-8B</p>
+        </div>
+        <div class="stat">
+          <p class="stat__value">+8.7%</p>
+          <p class="stat__label">Qwen3-14B</p>
+        </div>
+      </div>
+
+      <p>Ambient SFT は 8 タスク中 7 タスクで通常の SFT を改善しました。例外は IFEval で、モデルが大きくなるほど差は縮まり、14B では同じ値（78.6）でした。Qwen3-1.7B の例では、MATH が 24.3 → 40.4、GSM8K が 61.0 → 72.3、HumanEval+ が 68.0 → 83.7 と伸びた一方、IFEval は 58.8 → 52.3 に下がっています。</p>
+
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th scope="col">Qwen3-1.7B</th>
+            <th scope="col">通常の SFT</th>
+            <th scope="col">Ambient SFT</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">MATH</th>
+            <td>24.3</td>
+            <td><strong>40.4</strong></td>
+          </tr>
+          <tr>
+            <th scope="row">GSM8K</th>
+            <td>61.0</td>
+            <td><strong>72.3</strong></td>
+          </tr>
+          <tr>
+            <th scope="row">HumanEval+</th>
+            <td>68.0</td>
+            <td><strong>83.7</strong></td>
+          </tr>
+          <tr>
+            <th scope="row">IFEval</th>
+            <td><strong>58.8</strong></td>
+            <td>52.3</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>主な追加結果は次のとおりです。</p>
+      <ul>
+        <li><strong>小さいモデルで大きいモデルに並ぶ</strong>: 8 ベンチマークの平均で、Ambient SFT の 8B が通常 SFT の 14B と同等でした。MATH では、Ambient SFT の 1.7B（40.4）が通常 SFT の 8B（38.7）をすでに上回っています。</li>
+        <li><strong>データの出どころごとに温度を変える</strong>: Dolci-Instruct-SFT は 21 のソースの混合で、ソースによってベースモデルの当てはまりが異なります。ソースごとに温度を設定すると、全サイズで IFEval が改善し、他の利得も保たれました（平均相対改善は 1.7B で +21.1%、4B で +8.2%、8B で +10.1%）。</li>
+        <li><strong>他のモデルファミリー</strong>: OLMo-3-7B で +15.4%、Llama-3.1-8B で +8.3% の平均相対改善でした。ただしどちらも IFEval は通常の SFT より低くなっています。</li>
+        <li><strong>データ量を増やした場合</strong>: OLMo-3-7B から始めた実験で、データ 1% で平均相対改善 15.4%、10% で 3.4%、全量（100%）でも 8.6% でした。</li>
+        <li><strong>過学習への強さ</strong>: 10% のデータで 2〜10 エポック学習させると、通常の SFT は 2 → 6 エポックで IFEval が 71.0 → 80.8 に上がる一方、MATH（37.3 → 30.0）や GSM8K（76.4 → 69.6）など他のベンチマークがすべて下がりました。Ambient SFT は同じ範囲で IFEval が 63.8 → 73.4 に上がり、他のベンチマークは 2 エポック時点から約 2 ポイント以内にとどまりました。</li>
+      </ul>
+
+      <p>他の正則化手法との比較（Qwen3-1.7B、各手法の最良設定）では、平均相対改善が次のようになりました。</p>
+
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th scope="col">手法</th>
+            <th scope="col">平均相対改善（通常 SFT 比）</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">NEFTune</th>
+            <td>+0.8%</td>
+          </tr>
+          <tr>
+            <th scope="row">L2-SP</th>
+            <td>+15.3%</td>
+          </tr>
+          <tr>
+            <th scope="row">ラベル平滑化（Label smoothing）</th>
+            <td>−0.3%</td>
+          </tr>
+          <tr>
+            <th scope="row">知識蒸留（T = 1）</th>
+            <td>+17.0%</td>
+          </tr>
+          <tr>
+            <th scope="row">Ambient SFT</th>
+            <td><strong>+20.3%</strong></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>2 位は知識蒸留、つまり T = 1 に固定した Ambient SFT でした。温度を 1 より大きくすることに意味がある、という結果になっています。</p>
+
+      <h3>推論</h3>
+      <p>OLMo-3-7B を推論データ Dolci-Think-SFT の約 22K 例（1%）で学習し、GSM8K、AIME 2024 / 2025、HumanEval+、IFEval、GPQA で評価しました。通常 SFT に対する平均相対改善は次のとおりです。</p>
+
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th scope="col">手法</th>
+            <th scope="col">平均相対改善（通常 SFT 比）</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">ベースモデル</th>
+            <td>−35.6%</td>
+          </tr>
+          <tr>
+            <th scope="row">知識蒸留</th>
+            <td>−7.3%</td>
+          </tr>
+          <tr>
+            <th scope="row">L2-SP</th>
+            <td>−37.1%</td>
+          </tr>
+          <tr>
+            <th scope="row">Ambient SFT</th>
+            <td><strong>+3.5%</strong></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>Ambient SFT は 6 つのベンチマーク中 5 つで通常の SFT を上回りました（例: AIME24 39.8 → 44.5、GPQA 39.3 → 40.0）。GSM8K のみ 1.2 ポイント下回っています（94.2 vs 93.0）。比較した正則化手法のなかで、推論で SFT を改善したのは Ambient SFT だけでした。ただし著者ら自身、推論での改善幅はドメイン適応や指示チューニングより小さいと明記しています。</p>
+
+      <h2>意義と限界</h2>
+      <p>Ambient SFT は、通常の交差エントロピー損失に「微調整前の自分の予測を高温にしたものへ近づく項」を足すだけの、SFT の置き換えとして使える手法です。事前学習データがなくても、事前学習モデルそのものを情報源として活用できる点に特徴があります。著者らは、微調整データが少ないほど利得が大きいとまとめています。今後の課題としては、この考え方を SFT だけでなく、事後学習で使われる強化学習アルゴリズムへ広げることが挙げられています。</p>
+      <p>論文や結果から読み取れる限界は次のとおりです。</p>
+      <ul>
+        <li><strong>計算コストの増加</strong>: 凍結教師の順伝播が追加で必要で、実験設定で約 1.1 倍遅くなります。計算よりデータが制約となる場面向きです。</li>
+        <li><strong>事前学習モデルの得意不得意に依存</strong>: 教師がそのドメインをあまり知らない場合、効果は小さくなります（商品レビューでは勝ち幅がほぼありませんでした）。著者らは、対象ドメインのデータが十分にあれば効果は期待できないとも述べています。ただし指示チューニングでは、全量データでも平均 8.6% の改善が報告されています。</li>
+        <li><strong>指示追従での弱さ</strong>: 指示チューニングでは IFEval だけ通常の SFT を下回りました（ソースごとの温度設定で改善）。</li>
+        <li><strong>推論での改善幅は小さめ</strong>: 他の設定に比べて利得が限られます。</li>
+        <li><strong>理論の前提</strong>: 理論解析は、固定特徴の対数線形モデルなどの単純化した仮定のもとでの結果です。</li>
+      </ul>
+
+      <h2>まとめ</h2>
+      <p>Ambient SFT は、微調整前のモデルを凍結した教師とし、高温で平滑化した分布どうしを近づける項を SFT に加えることで、少量データでの過学習や忘却を抑える手法です。温度は「元のモデルをどこまで信じるか」を調整するつまみとして働き、T = 1 でも無限大でもない中間の値が良いことが理論と実験の両面から示されました。ドメイン適応・指示チューニング・推論で通常の SFT を上回る一方、効果は事前学習モデルのドメイン知識に左右されます。</p>
+
+    </div>
+
+    <section class="glossary">
+      <h2 class="glossary__title">用語集</h2>
+      <dl>
+        <dt>教師あり微調整（SFT: Supervised Fine-Tuning）</dt>
+        <dd>事前学習済みモデルを、目標とするデータで次トークン予測の損失を下げるように追加学習させる手法です。</dd>
+
+        <dt>事後学習（post-training）</dt>
+        <dd>事前学習のあとに行う、指示チューニング・アライメント・推論能力の付与などの段階です。</dd>
+
+        <dt>破滅的忘却（catastrophic forgetting）</dt>
+        <dd>新しいデータで学習した結果、以前に身につけた知識や能力を失ってしまう現象です。</dd>
+
+        <dt>サンプリング温度（temperature）</dt>
+        <dd>モデルの出力ロジット（softmax 前のスコア）を T で割ってから確率に変換する操作です。T &gt; 1 で分布が平らになります。</dd>
+
+        <dt>KL ダイバージェンス（KL divergence）</dt>
+        <dd>2 つの確率分布がどれだけ違うかを測る量で、同じなら 0 になります。</dd>
+
+        <dt>知識蒸留（Knowledge Distillation, KD）</dt>
+        <dd>教師モデルの出力分布に生徒モデルを近づけるよう学習させる手法です。</dd>
+
+        <dt>パープレキシティ（perplexity）</dt>
+        <dd>言語モデルが次のトークンをどれだけ予測しにくいかを表す指標で、低いほど良い予測です。</dd>
+
+        <dt>バイアス・バリアンスのトレードオフ</dt>
+        <dd>推定の誤差を「系統的なずれ（バイアス）」と「データによるばらつき（バリアンス）」に分けたとき、一方を減らすと他方が増えやすい関係のことです。</dd>
+      </dl>
+    </section>
+
+    <section class="paper-link">
+      <p class="paper-link__label">原論文</p>
+      <p class="paper-link__title">Ambient LLMs: Data-Efficient Supervised Fine-tuning via Temperature Matching</p>
+      <p><a href="https://arxiv.org/abs/2611.23229" target="_blank" rel="noopener noreferrer">arXiv:2611.23229 を読む（arxiv.org）</a></p>
+    </section>
+
+    <nav class="article__nav">
+      <a href="../index.html">← 記事一覧へ戻る</a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p>paper-lens — arXiv 論文の日本語解説</p>
+    </div>
+  </footer>
+</body>
+</html>
