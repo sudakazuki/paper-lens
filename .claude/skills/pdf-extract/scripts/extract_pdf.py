@@ -51,7 +51,7 @@ def extract_text(pdf_path: str) -> str:
     try:
         from pypdf import PdfReader
     except ImportError:
-        raise SystemExit("pypdf が未導入です。`python3 -m pip install pypdf` を実行してください。")
+        raise SystemExit("pypdf が見つかりません。本スクリプトは `uv run` で実行してください（PEP 723 で pypdf を自動取得します）。")
 
     reader = PdfReader(pdf_path)
     parts = []

@@ -1,7 +1,6 @@
 ---
 name: pdf-extract
 description: 論文 PDF の取得・テキスト化の手法と、解説記事の素材となる要点を忠実に抽出して analysis.md にまとめるフォーマット規約を内包する How スキル。論文解析（paper-analyzer）から名指しで呼び出される。PDF→テキストの機械的処理はスクリプトに、要点の構造化は本スキルの analysis.md 規約に従う。
-disable-model-invocation: true
 ---
 
 # pdf-extract — 論文 PDF のテキスト化・要点抽出

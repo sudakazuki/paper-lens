@@ -33,7 +33,7 @@ graph TD
         SK_FETCH["arxiv-fetch（収集コード同梱）"]
         SK_PDF["pdf-extract（解析コード同梱）"]
         SK_WRITE["japanese-tech-writing（記事仕様内包）"]
-        SK_IMG["codex-imagegen（画像生成）"]
+        SK_IMG["html-infographic（画像生成）"]
         SK_INFO["infographic-design（画像設計・判定基準）"]
         SK_HTML["html-page-design（共有CSS同梱）"]
     end
@@ -131,7 +131,8 @@ GitHub Pages の公開元 = `main` ブランチ・`docs/` 配下。設計ドキ�
   - `arxiv-fetch` — arXiv 検索・候補メタデータ取得（`scripts/fetch_arxiv.py`、標準ライブラリのみ）。検索条件既定値・メタデータ JSON 規約・新着/未解説判定の扱いを内包。
   - `pdf-extract` — PDF 取得・テキスト化（`scripts/extract_pdf.py`）。依存 `pypdf` はスクリプトが PEP 723 で自己宣言し `uv run` が隔離環境で自動解決する。`analysis.md` の要点抽出フォーマットと忠実性ルールを内包。
   - `japanese-tech-writing` — 記事仕様（読者像・トーン・構成・frontmatter）、レビュー 3 観点の判定基準、`output/` 命名規約、docs 追従方針を内包。
-  - `codex-imagegen` — Codex CLI（`codex exec`）の組み込み `image_gen` ツールでインフォグラフィックを生成・保存する。`article-image-generator` から使用する。
+  - `html-infographic` — インフォグラフィックを自己完結 HTML（CSS＋SVG）で描き、Edge / Chrome のヘッドレスモードで PNG 化する。API キー・有料プラン不要。`article-image-generator` から使用する。
+  - `codex-imagegen` — （代替）Codex CLI の組み込み `image_gen` で生成する方式。ChatGPT Plus 以上で利用可能。
   - `infographic-design` — 記事冒頭インフォグラフィックの設計・品質基準・画像内テキストの根拠規約・スタイル統一仕様・観点別判定基準の単一真実源。生成側 `article-image-generator` とレビュー側 `image-reviewer` が共有する。
   - `html-page-design` — リッチ HTML 記事ページのデザイン規約・共有外部 CSS（`assets/style.css` を同梱・単一真実源）・記事一覧トップ規約・公開元ディレクトリ規約・公開手順・HTML レビューの観点別判定基準（`design-consistency` / `readability`）の単一真実源。生成側 `article-html-author` とレビュー側 `html-reviewer` が共有する。
 - サブエージェント（`.claude/agents/`）: `paper-fetcher` / `paper-selector` / `paper-analyzer` / `article-writer` / `article-reviewer` / `article-image-generator` / `image-reviewer` / `doc-updater` / `article-html-author` / `html-reviewer`（全 10 体、`model: opus`）

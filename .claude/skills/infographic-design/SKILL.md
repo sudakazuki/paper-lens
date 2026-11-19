@@ -47,7 +47,7 @@ description: 論文解説記事の冒頭インフォグラフィック（cover.p
 - **解像度** — 1K 相当（1920×1080）。
 - **画像内文言** — 日本語。`article.md` の確定文言から取り、`japanese-tech-writing` の表記基準に従う。
 
-これらのスタイル値は本スキルが保持源である。生成側はこれを `codex-imagegen` のプロンプト設計テンプレートへ組み込む。
+これらのスタイル値は本スキルが保持源である。生成側はこれを `html-infographic` の HTML 規約に沿って HTML/CSS/SVG へ反映する（Codex 画像生成を使う環境では `codex-imagegen` のプロンプト設計テンプレートへ組み込む）。
 
 ## 観点別判定基準（image-fact / image-coverage / image-legibility / image-consistency）
 

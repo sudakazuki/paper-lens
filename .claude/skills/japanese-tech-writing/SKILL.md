@@ -1,7 +1,6 @@
 ---
 name: japanese-tech-writing
 description: arXiv 論文の日本語解説記事の仕様（読者像・トーン・構成・記事フォーマット・読みやすさ基準）と、output/ への記事ファイル命名・体裁規約、docs/ 追従更新時の日本語記述方針を内包する How スキル。記事執筆（article-writer）・観点別レビュー（article-reviewer）・出力/ドキュメント更新（doc-updater）から名指しで呼び出される、記事品質に関する唯一の根拠。
-disable-model-invocation: true
 ---
 
 # japanese-tech-writing — 日本語論文解説記事の仕様

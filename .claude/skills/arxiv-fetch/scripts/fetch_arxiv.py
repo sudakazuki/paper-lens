@@ -22,8 +22,24 @@ import xml.etree.ElementTree as ET
 ARXIV_API = "http://export.arxiv.org/api/query"
 ATOM = "{http://www.w3.org/2005/Atom}"
 
-DEFAULT_CATEGORIES = ["cs.AI", "cs.LG", "cs.CL"]
-DEFAULT_MAX_RESULTS = 30
+# 既定の対象分野: 医薬（LNP 等のナノ粒子／低分子医薬の CMC／ワクチン／核酸）。
+# 検索式は「(カテゴリのいずれか) AND (キーワードのいずれか)」。
+DEFAULT_CATEGORIES = [
+    "q-bio.BM", "q-bio.QM", "q-bio.TO", "q-bio.MN", "q-bio.CB", "q-bio.SC",
+    "physics.bio-ph", "physics.chem-ph", "physics.med-ph",
+    "cond-mat.soft", "cond-mat.mtrl-sci",
+]
+DEFAULT_KEYWORDS = [
+    # ナノ粒子・DDS
+    "lipid nanoparticle", "liposome", "nanomedicine", "drug delivery",
+    # 低分子医薬・CMC
+    "small-molecule drug", "pharmaceutical", "drug formulation", "drug product", "active pharmaceutical ingredient",
+    # ワクチン
+    "vaccine",
+    # 核酸
+    "mRNA", "siRNA", "oligonucleotide", "nucleic acid",
+]
+DEFAULT_MAX_RESULTS = 60
 
 
 def _norm_ws(text: str) -> str:
@@ -40,8 +56,29 @@ def _split_id_version(raw_id: str):
     return m.group(1), (m.group(2) or "")
 
 
-def build_query_url(categories, max_results):
-    cat_query = "+OR+".join(f"cat:{c}" for c in categories)
+def _term(field, value):
+    """arXiv search_query の 1 項。空白を含む語はフレーズ検索（"..."）にする。"""
+    if " " in value:
+        return f'{field}:%22{urllib.parse.quote_plus(value)}%22'
+    return f"{field}:{urllib.parse.quote_plus(value)}"
+
+
+def build_search_query(categories, keywords):
+    parts = []
+    if categories:
+        parts.append("%28" + "+OR+".join(_term("cat", c) for c in categories) + "%29")
+    if keywords:
+        # タイトルまたはアブストラクトに含むもの
+        # アブストラクトに含むもの（ti も足すと検索式が長くなり arXiv 側で解釈が崩れるため abs のみ）
+        kw = [_term("abs", k) for k in keywords]
+        parts.append("%28" + "+OR+".join(kw) + "%29")
+    if not parts:
+        raise SystemExit("カテゴリもキーワードも空です。少なくとも一方を指定してください。")
+    return "+AND+".join(parts)
+
+
+def build_query_url(categories, max_results, keywords=None, raw_query=None):
+    cat_query = raw_query or build_search_query(categories, keywords or [])
     params = (
         f"search_query={cat_query}"
         f"&sortBy=submittedDate&sortOrder=descending"
@@ -116,16 +153,19 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description="arXiv から候補論文メタデータを取得する")
     parser.add_argument("--out-dir", required=True, help="出力先ディレクトリ（例 work/<run-id>/papers）")
     parser.add_argument("--categories", default=",".join(DEFAULT_CATEGORIES),
-                        help="カンマ区切りの arXiv カテゴリ（既定: cs.AI,cs.LG,cs.CL）")
+                        help="カンマ区切りの arXiv カテゴリ（既定: 医薬系カテゴリ。空文字でカテゴリ条件なし）")
+    parser.add_argument("--keywords", default=",".join(DEFAULT_KEYWORDS),
+                        help="カンマ区切りのキーワード（タイトル/アブストラクトのいずれかに含む。空文字でキーワード条件なし）")
+    parser.add_argument("--query", default=None,
+                        help="arXiv search_query をそのまま指定（URL エンコード済み。指定時は --categories/--keywords を無視）")
     parser.add_argument("--max-results", type=int, default=DEFAULT_MAX_RESULTS,
-                        help="取得件数（既定: 30）")
+                        help=f"取得件数（既定: {DEFAULT_MAX_RESULTS}）")
     args = parser.parse_args(argv)
 
     categories = [c.strip() for c in args.categories.split(",") if c.strip()]
-    if not categories:
-        categories = DEFAULT_CATEGORIES
+    keywords = [k.strip() for k in args.keywords.split(",") if k.strip()]
 
-    url = build_query_url(categories, args.max_results)
+    url = build_query_url(categories, args.max_results, keywords=keywords, raw_query=args.query)
     xml_text = fetch(url)
     papers = parse_entries(xml_text)
 
