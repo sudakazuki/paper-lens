@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>医薬品合成で「実際に出た不純物」を集めたデータセット — 784 件に発生起源ラベルを付けた OPRD-Imp — paper-lens</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <p class="site-header__title"><a href="../index.html">paper-lens</a></p>
+    </div>
+  </header>
+
+  <main class="article">
+    <figure class="article__cover">
+      <img src="../assets/2026-11-05-2611.07488-oprd-imp-pharmaceutical-impurities-dataset-cover.png"
+           alt="「医薬品合成で『実際に出た不純物』784 件」を 4 つの区画で示すインフォグラフィック。1「課題」は、USPTO・ORD・ORDerly などの公開データが主生成物は広くカバーする一方、実際に観測された不純物は系統的に記録していないことを示す。2「手法」は、OPRD の論文 62 報から 229 反応、784 件の不純物を化学者が手作業で抽出し、3 名の化学者チームが照合して canonical SMILES で収録した流れを示す。3「結果」は発生起源 4 ラベルの件数（minor_product 341、carryover 294、SM_impure_carryover 101、SM_impure 48）の棒グラフ。4「結果」は NameRxn で Unrecognized（分類不能）となった割合が主生成物 19%、minor_product 58% であることを示す。">
+    </figure>
+
+    <h1 class="article__title">医薬品合成で「実際に出た不純物」を集めたデータセット — 784 件に発生起源ラベルを付けた OPRD-Imp</h1>
+    <div class="article__meta">
+      <span>公開日：2026-11-05</span>
+      <span>arXiv：2611.07488</span>
+      <span>カテゴリ：physics.chem-ph / cs.LG</span>
+    </div>
+
+    <div class="article__body">
+
+      <h2>この論文のひとことまとめ</h2>
+      <p>医薬品の製造プロセスを扱う専門誌 Organic Process Research &amp; Development（OPRD）の論文 62 報から、229 の反応を化学者が手作業で抜き出しました。そこで実験的に観測された不純物 784 件を、分子の構造を表す文字列（SMILES）と「その不純物がどこから来たか」を示す 4 種類のラベル付きで収録したのが、公開データセット <strong>OPRD-Imp</strong> です。</p>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat__value">62</div>
+          <div class="stat__label">データ源とした OPRD の論文（報）</div>
+        </div>
+        <div class="stat">
+          <div class="stat__value">229</div>
+          <div class="stat__label">手作業で抜き出した反応</div>
+        </div>
+        <div class="stat">
+          <div class="stat__value">784</div>
+          <div class="stat__label">実験的に観測された不純物（件）</div>
+        </div>
+        <div class="stat">
+          <div class="stat__value">4</div>
+          <div class="stat__label">「どこから来たか」を示す発生起源ラベルの種類</div>
+        </div>
+      </div>
+
+      <p>著者らはこれを、不純物を予測する機械学習モデルを評価するためのベンチマーク資源として位置づけています。</p>
+
+      <div class="callout callout--note">
+        <span class="callout__icon" aria-hidden="true">i</span>
+        <div class="callout__body">
+          <p>新しいモデルを提案する論文ではなく、<strong>データセットそのものを報告する論文</strong>です。</p>
+        </div>
+      </div>
+
+      <h2>なぜこの研究が重要か</h2>
+      <p>化学反応では、狙った生成物（主生成物）のほかに、望まない化合物も一緒にできたり混ざり込んだりします。これを不純物（impurity）や副生成物（side product）と呼びます。想定外の不純物は精製を難しくし、収率を下げます。研究段階では、正体不明の化合物が生物実験に持ち込まれ、結果の解釈を曖昧にすることもあります。</p>
+      <p>医薬品の製造段階では、問題はさらに大きくなります。</p>
+
+      <div class="callout">
+        <span class="callout__icon" aria-hidden="true">!</span>
+        <div class="callout__body">
+          <p>医薬品規制調和国際会議（ICH）のガイドライン Q3A・Q3B・M7 は、遺伝毒性のあるものを含む不純物を <strong>ppm レベルまで管理する</strong>ことを求めています。論文によれば、不純物の同定や管理に失敗すると、承認申請の遅れ、高コストな製造ロットの再処理、販売後のリコールにつながりえます。</p>
+        </div>
+      </div>
+
+      <p>ところが、どんな不純物ができるかは熟練した化学者でも予測が難しいとされます。そこで、過去に蓄積された実験の観測結果から、不純物ができるパターンを学ぶデータ駆動型のアプローチが期待されています。本論文は、その土台となるデータを用意する研究です。</p>
+
+      <h2>背景：何が問題だったのか</h2>
+      <p>有機化学向けの機械学習は、反応の生成物を当てる順方向反応予測や、目的の分子から合成経路をさかのぼる逆合成（retrosynthesis）などで成果を上げています。FlowER や Reactron のように、反応を素反応ステップの単位で表す機構的な予測手法も登場し、主生成物の予測を超えつつあります。しかし既存の反応予測ベンチマークの多くは主生成物に焦点を当てており、不純物の予測は相対的に注目されてきませんでした。</p>
+      <p>論文が「決定的なボトルネック」として挙げるのは、評価に使えるデータがないことです。</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">データ</th>
+            <th scope="col">カバーしているもの</th>
+            <th scope="col">不純物の記録状況</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">USPTO（米国特許由来の反応データ）・Open Reaction Database（ORD）・ORDerly</th>
+            <td>反応条件と主生成物を広くカバー</td>
+            <td>実際に観測された不純物を系統的には記録していない</td>
+          </tr>
+          <tr>
+            <th scope="row">特許や論文に基づく商用データセット</th>
+            <td>特許や論文に基づく反応</td>
+            <td>複数の生成物を報告するエントリはごく一部</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>このため、副生成物や反応機構を予測するモデルがあっても、厳密に評価できない状況でした。</p>
+      <p>不純物の構造を実験で確かめるのも手間がかかります。スケールアップ時に不純物を単離して NMR で同定するか、質量分析と反応機構の推論から構造の仮説を立て、別に合成した標品と比べるのが一般的です。網羅的に調べるのは、小さな実験規模でも資源を多く要します。</p>
+
+      <h2>提案手法：何をしたのか</h2>
+
+      <h3>データ源に OPRD を選んだ理由</h3>
+      <p>著者らは、医薬品プロセス化学（原薬の合成ルートを工業規模で実施できるよう開発・スケールアップする分野）の専門誌である OPRD に着目しました。理由は 3 つです。</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <p class="card__title"><span class="badge">1</span> 不純物の同定が重要な領域</p>
+          <p>OPRD は原薬（API、医薬品の有効成分）や医薬中間体の合成ルート開発に特化しており、不純物の同定が特に重要な領域である。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge">2</span> 根拠付きの詳しい報告</p>
+          <p>OPRD の論文は、観測された不純物の構造を分析的な根拠とともに詳しく報告するのが通例である。不純物の報告が系統的でない学術合成寄りの雑誌や、不純物データが通常ない特許由来のデータとは対照的である。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge">3</span> 実務に直結</p>
+          <p>実際の医薬品合成ワークフローにおける不純物予測に、直接関連する。</p>
+        </div>
+      </div>
+
+      <h3>論文の選び方から構造化までの流れ</h3>
+      <p>データセットは、次の段階を経て作られました。</p>
+
+      <ol class="timeline">
+        <li class="timeline__step">
+          <p class="timeline__step-title">1. 論文を検索する</p>
+          <p>OPRD のウェブサイトで "impurity" または "impurity validation" をキーワードに、2000〜2026 年の論文を検索しました（検索は 2026 年 5 月）。</p>
+        </li>
+        <li class="timeline__step">
+          <p class="timeline__step-title">2. 採択基準で絞り込む（62 報）</p>
+          <p>採択したのは、著者自身が行った反応ステップを少なくとも 1 つ含み、少なくとも 1 ステップについて不純物の構造が明示されている一次実験データの論文です。総説や計算のみの論文、不純物が名前だけで構造が示されていない論文は除外しました。結果として 62 報（出版年 2002〜2026 年）が採択されています。</p>
+        </li>
+        <li class="timeline__step">
+          <p class="timeline__step-title">3. チェックリストに沿って手作業で抽出する</p>
+          <p>訓練を受けた化学者が、補足資料（Supporting Information）を含む論文 PDF を読んで抽出しました。</p>
+        </li>
+        <li class="timeline__step">
+          <p class="timeline__step-title">4. 専門家が照合し、構造式と SMILES にする</p>
+          <p>3 名の化学者チームが各不純物と引用を原論文と照合し、canonical SMILES に変換しました。</p>
+        </li>
+        <li class="timeline__step">
+          <p class="timeline__step-title">5. 多段階ルートとして JSON に構造化する</p>
+          <p>連続する反応ステップと、不純物の来歴をたどれる形で記録しました。</p>
+        </li>
+      </ol>
+
+      <h3>チェックリストに沿った手作業の抽出</h3>
+      <p>決まった手順がないと、作業者間で判断がぶれたり、一箇所で軽く触れられただけの不純物を見落としたりするため、抽出チェックリストを設計しています。要旨・本文・実験項・すべての表や図・補足資料を必ず確認し、不純物ごとに原論文からの直接引用を根拠として記録させました。</p>
+      <p>抽出の段階では、報告のされ方による偏りを抑えるため、次のような言及まで幅広く拾いました。</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <p class="card__title">定量的</p>
+          <p>例: HPLC 面積で 1.2%</p>
+        </div>
+        <div class="card">
+          <p class="card__title">定性的</p>
+          <p>例: 微量検出</p>
+        </div>
+        <div class="card">
+          <p class="card__title">否定的</p>
+          <p>「生成は観測されず」という言及</p>
+        </div>
+        <div class="card">
+          <p class="card__title">暗示的</p>
+          <p>暗に言及されたもの</p>
+        </div>
+      </div>
+
+      <div class="callout callout--note">
+        <span class="callout__icon" aria-hidden="true">i</span>
+        <div class="callout__body">
+          <p>ただし公開データに残したのは、原論文が<strong>「実際に観測された」と報告した化合物だけ</strong>です。</p>
+        </div>
+      </div>
+
+      <h3>不純物の「発生起源」を 4 つに分類</h3>
+      <p>このデータセットの大きな特徴は、各不純物に「どこから来たか」を示すラベルを付けたことです。ラベルは、そのステップから見て最も早く特定できる発生源に基づいて割り当てます。</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">ラベル</th>
+            <th scope="col">意味</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row"><code>minor_product</code></th>
+            <td>そのステップの副反応で生成した不純物（選択性の失敗や過剰反応など）</td>
+          </tr>
+          <tr>
+            <th scope="row"><code>SM_impure</code></th>
+            <td>そのステップの前から出発原料や試薬に含まれていた不純物で、その反応では生成していないもの</td>
+          </tr>
+          <tr>
+            <th scope="row"><code>SM_impure_carryover</code></th>
+            <td>原料由来の不純物が、そのステップ中に化学変換されてできた不純物</td>
+          </tr>
+          <tr>
+            <th scope="row"><code>carryover</code></th>
+            <td>前のステップから変換されずに持ち越された不純物（生成物に残った未反応の原料・試薬も含む）</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>なお <code>SM_impure</code> は原料の供給に由来するため、反応機構からは予測できません。それでも実際のプロセス化学で観測される不純物の全体像を示すため、収録したと説明されています。ラベルの最終決定は、3 名の専門キュレーターの合意によります。</p>
+
+      <h3>専門家による照合と構造化</h3>
+      <p>3 名の化学者チームが、抽出された各不純物とその引用を原論文と照合しました。根拠のないものや化学的に妥当でないものは、却下または修正しています。残った不純物と、反応の反応物・試薬・溶媒・生成物を構造式に描き起こし、正規化された一意の表記である canonical SMILES に変換しました。立体化学（分子の立体的な配置）は原論文の描画どおりに転記しています。</p>
+      <p>データは JSON 形式で、同じ論文内の連続する反応ステップを <code>next_reaction_id</code> というフィールドでつなぎ、多段階の合成ルートを表現しています。さらに、持ち越された不純物には <code>parent</code> というフィールドで「親」となる化学種へのパスが記録されています。このパスを繰り返したどれば、ある不純物がどのステップのどの化合物から来たのかを、元の発生源までさかのぼれます。</p>
+
+      <figure class="diagram">
+        <svg viewBox="0 0 340 384" width="360" role="img" aria-label="データ構造の模式図。左列に反応ステップ 1、2、3 が縦に並び、next_reaction_id の矢印で順につながって多段階の合成ルートを表す。右列では、ステップ 3 の持ち越された不純物から parent のパスを点線矢印で上へたどると、ステップ 2 の親の化学種を経て、ステップ 1 の元の発生源に行き着く。">
+          <defs>
+            <marker id="imp-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L8,3 L0,6 z" fill="var(--color-text-muted)"></path>
+            </marker>
+            <marker id="imp-arrow-accent" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L8,3 L0,6 z" fill="var(--color-accent)"></path>
+            </marker>
+          </defs>
+
+          <rect x="8" y="10" width="170" height="64" rx="8" fill="var(--color-surface)" stroke="var(--color-border)" stroke-width="1.5"></rect>
+          <text x="93" y="36" text-anchor="middle" style="font-size:15px;font-weight:700;fill:var(--color-heading)">反応ステップ 1</text>
+          <text x="93" y="58" text-anchor="middle" style="font-size:12px;fill:var(--color-text-muted)">反応物・試薬・溶媒・生成物</text>
+
+          <path d="M93,74 L93,148" fill="none" stroke="var(--color-text-muted)" stroke-width="1.5" marker-end="url(#imp-arrow)"></path>
+          <text x="100" y="116" style="font-size:12px;fill:var(--color-text-muted)">next_reaction_id</text>
+
+          <rect x="8" y="150" width="170" height="64" rx="8" fill="var(--color-surface)" stroke="var(--color-border)" stroke-width="1.5"></rect>
+          <text x="93" y="176" text-anchor="middle" style="font-size:15px;font-weight:700;fill:var(--color-heading)">反応ステップ 2</text>
+          <text x="93" y="198" text-anchor="middle" style="font-size:12px;fill:var(--color-text-muted)">反応物・試薬・溶媒・生成物</text>
+
+          <path d="M93,214 L93,288" fill="none" stroke="var(--color-text-muted)" stroke-width="1.5" marker-end="url(#imp-arrow)"></path>
+          <text x="100" y="256" style="font-size:12px;fill:var(--color-text-muted)">next_reaction_id</text>
+
+          <rect x="8" y="290" width="170" height="64" rx="8" fill="var(--color-surface)" stroke="var(--color-border)" stroke-width="1.5"></rect>
+          <text x="93" y="316" text-anchor="middle" style="font-size:15px;font-weight:700;fill:var(--color-heading)">反応ステップ 3</text>
+          <text x="93" y="338" text-anchor="middle" style="font-size:12px;fill:var(--color-text-muted)">反応物・試薬・溶媒・生成物</text>
+
+          <rect x="200" y="20" width="132" height="44" rx="8" fill="var(--color-accent-soft)" stroke="var(--color-accent)" stroke-width="2"></rect>
+          <text x="266" y="47" text-anchor="middle" style="font-size:13px;font-weight:700;fill:var(--color-heading)">元の発生源</text>
+
+          <rect x="200" y="160" width="132" height="44" rx="8" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="1.5"></rect>
+          <text x="266" y="187" text-anchor="middle" style="font-size:13px;font-weight:700;fill:var(--color-heading)">親の化学種</text>
+
+          <rect x="200" y="300" width="132" height="44" rx="8" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="1.5"></rect>
+          <text x="266" y="327" text-anchor="middle" style="font-size:13px;font-weight:700;fill:var(--color-heading)">持ち越された不純物</text>
+
+          <path d="M266,300 L266,206" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#imp-arrow-accent)"></path>
+          <text x="272" y="258" style="font-size:12px;fill:var(--color-accent)">parent</text>
+          <path d="M266,160 L266,66" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#imp-arrow-accent)"></path>
+          <text x="272" y="118" style="font-size:12px;fill:var(--color-accent)">parent</text>
+
+          <path d="M178,42 L200,42" fill="none" stroke="var(--color-border)" stroke-width="1.5"></path>
+          <path d="M178,182 L200,182" fill="none" stroke="var(--color-border)" stroke-width="1.5"></path>
+          <path d="M178,322 L200,322" fill="none" stroke="var(--color-border)" stroke-width="1.5"></path>
+        </svg>
+        <figcaption class="diagram__caption">データ構造の模式図。<code>next_reaction_id</code> が同じ論文内の連続する反応ステップをつなぎ、<code>parent</code> を繰り返したどると持ち越された不純物を元の発生源までさかのぼれる（ステップ数は説明のための例）。</figcaption>
+      </figure>
+
+      <h2>結果：何が分かったのか</h2>
+
+      <h3>データセットの規模と中身</h3>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat__value">784</div>
+          <div class="stat__label">不純物エントリ（論文 62 報・反応 229）</div>
+        </div>
+        <div class="stat">
+          <div class="stat__value">3</div>
+          <div class="stat__label">1 反応あたりの不純物数の中央値（平均 3.4）</div>
+        </div>
+        <div class="stat">
+          <div class="stat__value">12</div>
+          <div class="stat__label">不純物が 10 件以上ある反応</div>
+        </div>
+      </div>
+
+      <p>起源別の内訳は次のとおりです。</p>
+
+      <figure class="diagram">
+        <svg viewBox="0 0 340 196" width="400" role="img" aria-label="発生起源ラベル別の不純物件数の横棒グラフ。minor_product 341 件、carryover 294 件、SM_impure_carryover 101 件、SM_impure 48 件。">
+          <text x="8" y="30" style="font-size:12px;font-weight:700;fill:var(--color-heading)">minor_product</text>
+          <rect x="150" y="16" width="148" height="20" rx="3" fill="var(--color-accent)"></rect>
+          <text x="304" y="31" style="font-size:12px;font-weight:700;fill:var(--color-heading)">341</text>
+
+          <text x="8" y="76" style="font-size:12px;font-weight:700;fill:var(--color-heading)">carryover</text>
+          <rect x="150" y="62" width="128" height="20" rx="3" fill="var(--color-accent)" fill-opacity="0.7"></rect>
+          <text x="284" y="77" style="font-size:12px;font-weight:700;fill:var(--color-heading)">294</text>
+
+          <text x="8" y="122" style="font-size:12px;font-weight:700;fill:var(--color-heading)">SM_impure_carryover</text>
+          <rect x="150" y="108" width="44" height="20" rx="3" fill="var(--color-accent)" fill-opacity="0.5"></rect>
+          <text x="200" y="123" style="font-size:12px;font-weight:700;fill:var(--color-heading)">101</text>
+
+          <text x="8" y="168" style="font-size:12px;font-weight:700;fill:var(--color-heading)">SM_impure</text>
+          <rect x="150" y="154" width="21" height="20" rx="3" fill="var(--color-accent)" fill-opacity="0.35"></rect>
+          <text x="177" y="169" style="font-size:12px;font-weight:700;fill:var(--color-heading)">48</text>
+        </svg>
+        <figcaption class="diagram__caption">発生起源ラベル別の不純物件数（合計 784 件）。棒の長さは件数に比例。</figcaption>
+      </figure>
+
+      <p>反応の種類は、アミド結合形成、還元的アミノ化、保護基の着脱、パラジウム触媒クロスカップリング、不斉変換など、医薬品プロセス化学の幅広い範囲にわたります。</p>
+      <p>データは figshare で CC BY 4.0 ライセンスのもと公開されています。JSON 本体に加え、反応ごとに構造式で閲覧できる単一ファイルの対話的ダッシュボード（HTML）も同梱されています。</p>
+
+      <h3>不純物リストが空の反応</h3>
+      <p>不純物が記録されていない反応もあります。</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <p class="card__title"><span class="badge">9 件</span> ワンポット手順の途中ステップ</p>
+          <p>複数ステップを中間体を取り出さずに一つの容器で行うワンポット（one-pot）手順の途中ステップ。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge badge--accent-2">19 件</span> 原論文が報告していない</p>
+          <p>原論文がそのステップの不純物を報告していないもの（229 の 8.3%）。</p>
+        </div>
+      </div>
+
+      <p>著者らは、この 19 件がいずれも完全転化や 100% 収率を報告していないことを確認しています。不純物が分析前の後処理で除かれたか、単に検出されなかった可能性があるとしています。</p>
+
+      <h3>既存の反応分類ツールで見えた「主生成物と不純物の違い」</h3>
+      <p>著者らは、反応を人名反応などのクラスに自動分類する商用ツール NameRxn で、主生成物 229 と不純物 784 の計 1,013 反応を分類しました。そして、大規模反応データセットとクラス分布を比べています。</p>
+
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th scope="col">データ</th>
+            <th scope="col">反応数</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">OPRD-Imp（主生成物 229 ＋ 不純物 784）</th>
+            <td>1,013</td>
+          </tr>
+          <tr>
+            <th scope="row">USPTO</th>
+            <td>約 0.97 M</td>
+          </tr>
+          <tr>
+            <th scope="row">Pistachio</th>
+            <td>約 4.3 M</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <ul>
+        <li>主生成物のクラス分布は、USPTO や Pistachio とほとんど区別できませんでした。</li>
+        <li>不純物は、主生成物に比べて "Resolution"（化学変換のない分離などに相当するクラス）と "Unrecognized"（分類不能）に偏っていました。</li>
+      </ul>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat__value">19%</div>
+          <div class="stat__label">主生成物の "Unrecognized" 率</div>
+        </div>
+        <div class="stat">
+          <div class="stat__value">58%</div>
+          <div class="stat__label">副反応でできた minor_product の "Unrecognized" 率</div>
+        </div>
+        <div class="stat">
+          <div class="stat__value">97%</div>
+          <div class="stat__label">"Resolution" の不純物 224 件のうち、残った出発原料や試薬だった割合（217 件）</div>
+        </div>
+      </div>
+
+      <p>著者らは、"Unrecognized" は化学の新しさだけでなく、分類ツール側のカバー範囲も反映していると解釈しています。多くの不純物は過剰反応・脱離・転位などの変換であり、単一の人名反応ラベルを持たないだけだという見方です。</p>
+
+      <div class="callout callout--note">
+        <span class="callout__icon" aria-hidden="true">i</span>
+        <div class="callout__body">
+          <p>例として、芳香族求核置換反応（SNAr）で 1 回置換すると目的物になり、2 回置換するとビス付加体の不純物ができるケースが挙げられています。後者は正味の二重置換であるため、単一クラスに割り当てられません。</p>
+        </div>
+      </div>
+
+      <h3>技術的な検証</h3>
+      <p>すべての SMILES を化学情報ライブラリ RDKit で読み込み、有効な分子として扱えることを確認しています。</p>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat__value">164</div>
+          <div class="stat__label"><code>next_reaction_id</code> 参照（すべて正しく解決）</div>
+        </div>
+        <div class="stat">
+          <div class="stat__value">438</div>
+          <div class="stat__label"><code>parent</code> パスを持つ件数（すべて同じ論文の同じかそれ以前のステップの化学種に解決）</div>
+        </div>
+        <div class="stat">
+          <div class="stat__value">3 回以上</div>
+          <div class="stat__label">各論文の精査回数（うち 2 回は元の抽出を担当していないキュレーター）</div>
+        </div>
+      </div>
+
+      <p><code>parent</code> パスを持たない残りは、minor_product 341 件と、発生源が特定できない 5 件です。</p>
+
+      <h2>意義と限界</h2>
+      <p>著者らは OPRD-Imp を、規模よりも「アノテーションの信頼性」を優先して設計したベンチマークと位置づけています。特徴として挙げているのは次の 4 点です。</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <p class="card__title"><span class="badge">1</span> 実験で報告された不純物</p>
+          <p>実験で報告され、構造がキュレーションされた不純物アノテーション</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge">2</span> 起源ラベル</p>
+          <p>起源カテゴリ別にモデルを評価できる起源ラベル</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge">3</span> 来歴パス</p>
+          <p>反応ステップ間の連結と、不純物を発生源までたどれる来歴パス</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge">4</span> 反応クラス注釈</p>
+          <p>すべての生成物・不純物への反応クラス注釈</p>
+        </div>
+      </div>
+
+      <p>一方で、論文は次のような限界や利用上の注意を明記しています。</p>
+
+      <div class="callout">
+        <span class="callout__icon" aria-hidden="true">!</span>
+        <div class="callout__body">
+          <p>不純物リストが空のステップは「報告がない」だけで、「不純物がない」証拠ではありません。<strong>負例ではなく未アノテーションとして扱うべき</strong>とされています。</p>
+        </div>
+      </div>
+
+      <ul>
+        <li>HPLC 面積％などの定量情報は抽出時に取得しましたが、報告の仕方が不均一で不完全なことが多いため、公開データには含めていません。定量情報の組み込みは今後の課題です。</li>
+        <li><code>SM_impure</code> は反応機構から予測できません。</li>
+        <li>規模は 229 反応・784 件で、信頼性を規模より優先した設計です。</li>
+        <li>反応クラス注釈に使った NameRxn は商用ツールです。投入したデータと得られたラベルはデータに保存されており、ライセンス保有者は再現できます。</li>
+        <li>本論文には、既存の反応予測モデルを OPRD-Imp で実際に評価した結果は含まれていません。</li>
+      </ul>
+
+      <h2>まとめ</h2>
+      <p>OPRD-Imp は、医薬品プロセス化学の論文から実際に観測された不純物 784 件を手作業で集め、発生起源ラベルと来歴パスを付けた公開データセットです。主生成物に偏っていた既存の反応データを補い、不純物予測モデルを評価するための土台を提供します。分類ツールで見ると、副反応由来の不純物の多くが既存の反応クラスに収まらないことも示されました。</p>
+
+    </div>
+
+    <section class="glossary">
+      <h2 class="glossary__title">用語集</h2>
+      <dl>
+        <dt>不純物（impurity）／副生成物（side product）</dt>
+        <dd>目的の主生成物以外に生じる、または混入する化合物。本データセットでは原論文で観測が報告されたもののみを収録。</dd>
+
+        <dt>プロセス化学（process chemistry）</dt>
+        <dd>医薬品原薬の合成ルートを、工業規模で実施できるよう開発・スケールアップする分野。OPRD はその専門誌。</dd>
+
+        <dt>原薬（API, active pharmaceutical ingredient）</dt>
+        <dd>医薬品の有効成分。</dd>
+
+        <dt>SMILES</dt>
+        <dd>分子構造を 1 行の文字列で表す記法。canonical SMILES は同じ分子に対して一意に決まる正規化表記。</dd>
+
+        <dt>carryover（持ち越し）</dt>
+        <dd>前のステップの不純物や未反応原料が、次のステップに入り込むこと。</dd>
+
+        <dt>ワンポット（one-pot）</dt>
+        <dd>複数の反応ステップを、中間体を取り出さずに一つの容器で行う手順。</dd>
+
+        <dt>NameRxn</dt>
+        <dd>NextMove Software の商用反応分類ツール。反応に人名反応などの階層的なクラスを付与する。</dd>
+
+        <dt>ICH Q3A / Q3B / M7</dt>
+        <dd>医薬品規制調和国際会議のガイドライン。新原薬・新製剤の不純物、変異原性不純物の評価と管理を扱う。</dd>
+      </dl>
+    </section>
+
+    <section class="paper-link">
+      <p class="paper-link__label">原論文</p>
+      <p class="paper-link__title">OPRD-Imp: a dataset of experimentally observed impurities and side products in multi-step pharmaceutical syntheses</p>
+      <p><a href="https://arxiv.org/abs/2611.07488" target="_blank" rel="noopener noreferrer">arXiv:2611.07488 を読む（arxiv.org）</a></p>
+    </section>
+
+    <nav class="article__nav">
+      <a href="../index.html">← 記事一覧へ戻る</a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p>paper-lens — arXiv 論文の日本語解説</p>
+    </div>
+  </footer>
+</body>
+</html>
