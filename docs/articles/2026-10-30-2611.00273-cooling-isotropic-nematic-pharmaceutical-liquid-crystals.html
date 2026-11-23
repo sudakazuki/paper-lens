@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>薬の液晶を冷やすとき、試料の「厚さ」で何が変わるのか — 臨界厚さ約 4.56 mm を境に冷え方の支配要因が切り替わる数理モデル — paper-lens</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <p class="site-header__title"><a href="../index.html">paper-lens</a></p>
+    </div>
+  </header>
+
+  <main class="article">
+    <figure class="article__cover">
+      <img src="../assets/2026-10-30-2611.00273-cooling-isotropic-nematic-pharmaceutical-liquid-crystals-cover.png"
+           alt="「厚さ 約 4.56 mm を境に冷え方の支配要因が切り替わる」を、対象と課題・手法・結果・厚さの 4 区画で示すインフォグラフィック。対象と課題の区画は、底面だけを冷却浴に接触させ上面・側面を断熱した高さ d の円筒セルと、等方相→ネマチック相（363 K）の転移を示す。手法の区画は、温度 θ と分子のそろい具合 s を同時に扱う方程式系、ポテンシャルの多項式近似と収束の証明、適定性の証明、無次元化と数値計算を並べる。結果の区画は、薄い試料 0.344 mm（B1 = 5.683×10⁻³、温度はほぼ一様で冷却浴の時間スケールに従う）と厚い試料 1.0 cm（B1 = 4.803、前線が底から上へ移動し通過に約 143.8 s、内部の熱伝導で決まる）を対比する。厚さの区画は、臨界厚さ d_crit ≈ 4.56 mm（B1 = 1）を境に、薄い側は冷却浴が支配、厚い側は内部の熱拡散が支配する数直線を示す。">
+    </figure>
+
+    <h1 class="article__title">薬の液晶を冷やすとき、試料の「厚さ」で何が変わるのか — 臨界厚さ約 4.56 mm を境に冷え方の支配要因が切り替わる数理モデル</h1>
+    <div class="article__meta">
+      <span>公開日：2026-10-30</span>
+      <span>arXiv：2611.00273</span>
+      <span>カテゴリ：math.AP / cond-mat.soft</span>
+    </div>
+
+    <div class="article__body">
+
+      <h2>この論文のひとことまとめ</h2>
+      <p>医薬用の液晶性化合物イトラコナゾール（itraconazole, ITZ）を底から冷やしたときに、分子の向きがそろっていく相転移を数理モデルで記述した研究です。著者らは、温度と分子の向きの変化を同時に扱う方程式系を立てました。そのうえで、方程式が熱力学と矛盾しないことと、数学的に解がきちんと定まることを証明しています。さらにスケーリング解析と数値計算から、試料の厚さが約 4.56 mm（臨界厚さ）を境に、冷え方を支配する要因が「冷却浴」から「試料内部の熱の伝わり方」へ切り替わることを示しました。</p>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <p class="stat__value">約 4.56 mm</p>
+          <p class="stat__label">臨界厚さ d_crit。これを境に、冷え方を支配する要因が「冷却浴」から「試料内部の熱の伝わり方」へ切り替わる</p>
+        </div>
+        <div class="stat">
+          <p class="stat__value">363 K</p>
+          <p class="stat__label">本論文が扱う等方相→ネマチック相の転移温度（文献の DSC による冷却時の値）</p>
+        </div>
+        <div class="stat">
+          <p class="stat__value">約 143.8 s</p>
+          <p class="stat__label">厚さ 1.0 cm の試料で、転移温度に達する前線が円筒の高さ全体を通過するのにかかる時間（数値計算）</p>
+        </div>
+      </div>
+
+      <h2>なぜこの研究が重要か</h2>
+      <p>飲み薬の有効成分は、水に溶けやすく体に吸収されやすい形で使う必要があります。そのため従来は、結晶や非晶質（アモルファス）といった固体の形が使われてきました。液晶になる化合物は、こうした医薬材料開発の追加の選択肢として位置づけられています。</p>
+      <p>液晶材料の加工は、相転移の起こり方と深く結びついています。室温でガラス状の材料を得るには、高温の液体を冷やしていきます。その途中で、分子運動が止まる「速度論的凍結（kinetic arrest）」が起こる前にどの相を通るかは、冷却速度の影響を受けます。つまり「どう冷やすか」が、できあがる材料の状態を左右します。</p>
+
+      <div class="callout callout--note">
+        <span class="callout__icon" aria-hidden="true">i</span>
+        <div class="callout__body">
+          <p><strong>「どう冷やすか」が、できあがる材料の状態を左右します。</strong>速度論的凍結が起こる前にどの相を通るかは、冷却速度の影響を受けるためです。</p>
+        </div>
+      </div>
+
+      <p>著者らは、ラボでの評価から工業生産へとスケールを上げると、材料内部の場所ごとの温度履歴が根本的に変わると述べています。本論文は、試料の大きさによって冷え方がどう変わるかを予測する数理的な枠組みを提供することを目指しています。</p>
+
+      <h2>背景：何が問題だったのか</h2>
+      <p>対象の ITZ は、温度によって液晶相が現れるサーモトロピック（thermotropic）な化合物です。ガラスを作りやすい性質も持ち、熱量測定や X 線散乱の実験データがそろっています。文献の示差走査熱量測定（DSC）によると、冷却時の主な転移温度は次のとおりです。</p>
+
+      <ol class="timeline">
+        <li class="timeline__step">
+          <p class="timeline__step-title">363 K：等方相→ネマチック相の転移 <span class="badge">本論文の対象</span></p>
+          <p>分子の向きがばらばらな液体から、向きだけがそろった液晶の状態へ移ります。</p>
+        </li>
+        <li class="timeline__step">
+          <p class="timeline__step-title">347 K：ネマチック相→スメクチック相の転移</p>
+          <p>十分ゆっくり冷やした場合の値です。</p>
+        </li>
+        <li class="timeline__step">
+          <p class="timeline__step-title">328 K：ガラス転移温度</p>
+        </li>
+      </ol>
+
+      <p>ここで等方相（isotropic phase）は分子の向きがばらばらな液体の状態です。ネマチック相（nematic phase）は、分子の位置はばらばらのまま向きだけがそろった液晶の状態です。本論文が扱うのは、このうち等方相→ネマチック相の転移だけです。</p>
+      <p>理論面では、分子のそろい具合に応じたエネルギー（バルクポテンシャル）の選び方に課題がありました。</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <p class="card__title"><span class="badge">Landau–de Gennes</span> 多項式で書くポテンシャル</p>
+          <p>扱いやすい一方、物理的にありえない状態を排除できません。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge badge--accent-2">Ball–Majumdar</span> 端で無限大になるポテンシャル</p>
+          <p>物理的な範囲の端でエネルギーが無限大になり、ありえない状態を自然に排除します。ただし式が陰的にしか与えられないため、解析や計算に使いにくいという弱点があります。</p>
+        </div>
+      </div>
+
+      <h2>提案手法：何をしたのか</h2>
+
+      <h3>1. 温度と分子の向きを同時に扱うモデル</h3>
+      <p>土台にしたのは、Ericksen 理論（Ericksen's theory with variable degree of orientation）と呼ばれる液晶の連続体理論です。著者らはこれを温度変化も扱える形（非等温版）に拡張しました。液体全体の流れは無視しています。未知数は次の 3 つです。</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <p class="card__title"><span class="badge">n</span> ダイレクタ（director）</p>
+          <p>分子がそろう方向を表す単位ベクトル。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge">s</span> スカラー秩序パラメータ（scalar order parameter）</p>
+          <p>そろい具合を表す数。s = 0 が等方（ばらばら）、s = 1 が完全にそろった状態で、物理的な範囲は −1/2 &lt; s &lt; 1 です。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge">θ</span> 温度</p>
+        </div>
+      </div>
+
+      <p>エネルギーとエントロピーの関係を定め、熱力学第二法則の局所形である Clausius–Duhem 不等式を満たすように方程式を導きました。この結果、分子の向きがそろう変化が熱の方程式に寄与する形になります。また、熱の伝わりやすさ（熱伝導率）は、分子の向きに平行な方向と垂直な方向とで異なるように扱っています。</p>
+      <p>想定する形は、高さ d の円筒形の試料セルです。底面だけを冷却浴に接触させ、側面と上面は断熱とします。冷却浴の温度は時間とともに一定の速さで下がります。浴との熱のやりとりは、温度差に比例して熱が流れる Newton–Robin 境界条件で表します。側壁で分子の向きを鉛直に固定すると、向きは全体で鉛直のまま変わらない解が得られます。さらに初期値が高さ方向の座標だけに依存する場合、問題は高さ方向だけの s と温度の 1 次元問題に帰着します。</p>
+
+      <figure class="diagram">
+        <svg viewBox="0 0 360 330" width="420" role="img" aria-label="想定する円筒形の試料セルの図。高さ d の円筒で、上面と側面は断熱、底面だけが冷却浴に接触する。冷却浴の温度は一定の速さで下がり、浴との熱のやりとりは Newton–Robin 境界条件で表す。熱は底面からだけ逃げる。">
+          <defs>
+            <marker id="lc-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L8,3 L0,6 z" fill="var(--color-accent)"></path>
+            </marker>
+            <marker id="lc-arrow-muted" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L8,3 L0,6 z" fill="var(--color-text-muted)"></path>
+            </marker>
+          </defs>
+
+          <text x="130" y="22" text-anchor="middle" style="font-size:15px;font-weight:700;fill:var(--color-heading)">上面：断熱</text>
+
+          <path d="M70,60 L70,220 A60,16 0 0 0 190,220 L190,60" fill="var(--color-surface)" stroke="var(--color-border)" stroke-width="2"></path>
+          <ellipse cx="130" cy="60" rx="60" ry="16" fill="var(--color-surface)" stroke="var(--color-border)" stroke-width="2"></ellipse>
+          <text x="130" y="138" text-anchor="middle" style="font-size:16px;font-weight:700;fill:var(--color-heading)">試料</text>
+          <text x="130" y="160" text-anchor="middle" style="font-size:14px;fill:var(--color-text-muted)">（ITZ）</text>
+
+          <path d="M44,60 L44,220" fill="none" stroke="var(--color-text-muted)" stroke-width="1.5" marker-end="url(#lc-arrow-muted)"></path>
+          <path d="M44,220 L44,60" fill="none" stroke="var(--color-text-muted)" stroke-width="1.5" marker-end="url(#lc-arrow-muted)"></path>
+          <text x="30" y="145" text-anchor="middle" style="font-size:15px;fill:var(--color-heading)">d</text>
+
+          <text x="204" y="120" style="font-size:15px;font-weight:700;fill:var(--color-heading)">側面：断熱</text>
+
+          <rect x="40" y="244" width="180" height="34" rx="8" fill="var(--color-accent-soft)" stroke="var(--color-accent)" stroke-width="2"></rect>
+          <text x="130" y="266" text-anchor="middle" style="font-size:15px;font-weight:700;fill:var(--color-heading)">冷却浴（底面だけ接触）</text>
+
+          <path d="M250,216 L250,262 L224,262" fill="none" stroke="var(--color-accent)" stroke-width="1.5" marker-end="url(#lc-arrow)"></path>
+          <text x="204" y="190" style="font-size:14px;fill:var(--color-text-muted)">熱は底面から</text>
+          <text x="204" y="206" style="font-size:14px;fill:var(--color-text-muted)">だけ逃げる</text>
+
+          <text x="180" y="302" text-anchor="middle" style="font-size:14px;fill:var(--color-text-muted)">浴の温度は一定の速さで下がる</text>
+          <text x="180" y="322" text-anchor="middle" style="font-size:14px;fill:var(--color-text-muted)">境界条件：Newton–Robin（温度差に比例）</text>
+        </svg>
+        <figcaption class="diagram__caption">高さ d の円筒セルの底面だけを冷却浴に接触させる。向きが全体で鉛直のまま変わらない場合、問題は高さ方向だけの s と温度の 1 次元問題に帰着する。</figcaption>
+      </figure>
+
+      <h3>2. 扱いにくいポテンシャルを多項式で近似</h3>
+      <p>Ball–Majumdar ポテンシャルを、端で無限大になる「特異な部分」と、なめらかな「残りの部分」に分けました。残りの部分は第一種 Chebyshev 多項式（直交多項式の一種）で近似します。著者らは、この近似が元のポテンシャルに収束することを証明しました。近似しても、転移温度 363 K で 2 つの状態が共存する条件と、端でエネルギーが無限大になる性質は保たれます（Theorem 1）。</p>
+
+      <h3>3. 方程式の解がきちんと定まることの証明</h3>
+      <p>円筒の角を丸めた領域で、解が短い時間なら存在し、ただ 1 つに決まり、初期条件や境界条件に連続的に依存することを証明しました。このような性質を適定性（well-posedness）と呼びます（Theorem 2）。</p>
+      <p>あわせて、温度が正に保たれている限り、s が物理的な範囲の端（−1/2 や 1）に近づかないことも示しています。そのため、解の大きさ（ノルム）が有限にとどまる場合、有限時間で破綻するとすれば温度の正の下限が失われる形しかありません。</p>
+
+      <h3>4. 無次元化と数値計算</h3>
+      <p>方程式を無次元化して、どの効果が効いているかを比べました。この部分の計算には、扱いやすい多項式の Landau–de Gennes ポテンシャルを使っています。鍵になるのは次の 2 つの数です。</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <p class="card__title"><span class="badge">B1</span> 時間スケールの比</p>
+          <p>試料内部で熱が拡散するのにかかる時間と、冷却浴の温度変化の時間との比。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge badge--accent-2">Bi</span> Biot 数</p>
+          <p>境界での熱の受け渡しと、内部での熱伝導の比。</p>
+        </div>
+      </div>
+
+      <p>B1 = 1 となる厚さを臨界厚さ d_crit と定義しました。熱拡散率を D_T、冷却浴の基準時間を t0 とすると、d_crit = √(D_T t0) です。</p>
+      <p>厚い試料では、s の時間・空間変化の項がとても小さくなります。そこで s を温度だけで決まる関数とみなし、相転移の潜熱を取り込んだ「有効熱容量」を持つ 1 本の熱方程式に縮約しました。数値計算では、空間を 150 点の格子で離散化して時間方向の常微分方程式にする線の方法（Method of Lines）を使いました。時間積分には、急激に変化する問題に強い陰的解法 Radau IIA を使っています。</p>
+
+      <h2>結果：何が分かったのか</h2>
+      <p>計算は新しい実験ではなく、ITZ の物性値と文献の DSC・比熱データを使ったモデル計算です。主な物性値と条件は次のとおりです。</p>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <p class="stat__value">≈ 3.478 × 10<sup>−7</sup> m²/s</p>
+          <p class="stat__label">熱拡散率 D_T</p>
+        </div>
+        <div class="stat">
+          <p class="stat__value">0.0167 K/s</p>
+          <p class="stat__label">冷却浴の冷却速度 h（基準時間 t0 = 59.86 s）</p>
+        </div>
+        <div class="stat">
+          <p class="stat__value">100 W/(m²K)</p>
+          <p class="stat__label">浴との熱伝達係数 γ</p>
+        </div>
+      </div>
+
+      <p>これらの値から、臨界厚さは d_crit ≈ 4.56 mm になります。比較したのは、ラボの測定スケールである厚さ 0.344 mm の薄い試料と、厚さ 1.0 cm の厚い試料です。</p>
+
+      <figure class="diagram">
+        <svg viewBox="0 0 360 170" width="520" role="img" aria-label="試料の厚さの数直線。0 から 10 mm の範囲で、臨界厚さ d_crit ≈ 4.56 mm（B1 = 1）を境に、薄い側は冷却浴が支配、厚い側は内部の熱拡散が支配する。比較した薄い試料 0.344 mm は冷却浴が支配する側、厚い試料 1.0 cm は内部の熱拡散が支配する側にある。">
+          <text x="166" y="20" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--color-heading)">d_crit ≈ 4.56 mm（B1 = 1）</text>
+          <rect x="20" y="52" width="146" height="40" fill="var(--color-accent-soft)"></rect>
+          <rect x="166" y="52" width="174" height="40" fill="var(--color-surface)" stroke="var(--color-border)" stroke-width="1"></rect>
+          <text x="93" y="77" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--color-heading)">冷却浴が支配</text>
+          <text x="253" y="77" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--color-heading)">内部の熱拡散が支配</text>
+          <path d="M166,30 L166,104" fill="none" stroke="var(--color-heading)" stroke-width="2" stroke-dasharray="5 4"></path>
+          <path d="M20,104 L340,104" fill="none" stroke="var(--color-text-muted)" stroke-width="1.5"></path>
+          <path d="M20,98 L20,110 M180,98 L180,110 M340,98 L340,110" fill="none" stroke="var(--color-text-muted)" stroke-width="1.5"></path>
+          <text x="20" y="126" text-anchor="middle" style="font-size:13px;fill:var(--color-text-muted)">0</text>
+          <text x="180" y="126" text-anchor="middle" style="font-size:13px;fill:var(--color-text-muted)">5</text>
+          <text x="340" y="126" text-anchor="end" style="font-size:13px;fill:var(--color-text-muted)">10 mm</text>
+          <circle cx="31" cy="104" r="6" fill="var(--color-accent)"></circle>
+          <circle cx="340" cy="104" r="6" fill="var(--color-accent-2)"></circle>
+          <text x="24" y="152" style="font-size:13px;font-weight:700;fill:var(--color-accent)">薄い試料 0.344 mm</text>
+          <text x="340" y="152" text-anchor="end" style="font-size:13px;font-weight:700;fill:var(--color-accent-2)">厚い試料 1.0 cm</text>
+        </svg>
+        <figcaption class="diagram__caption">B1 = 1 となる厚さが臨界厚さ。比較した 2 つの試料は、その両側に位置する。</figcaption>
+      </figure>
+
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th scope="col">項目</th>
+            <th scope="col">薄い試料<br>d = 0.344 mm</th>
+            <th scope="col">厚い試料<br>d = 1.0 cm</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">B1</th>
+            <td>5.683 × 10<sup>−3</sup>（≪ 1）</td>
+            <td>4.803／Bi = 1.25</td>
+          </tr>
+          <tr>
+            <th scope="row">試料内の温度</th>
+            <td>ほぼ一様（準等温）</td>
+            <td>拡散時間 約 287.5 s</td>
+          </tr>
+          <tr>
+            <th scope="row">転移の進み方を<br>決めるもの</th>
+            <td>冷却浴の時間スケール</td>
+            <td>内部の熱伝導</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p><strong>薄い試料（d = 0.344 mm）</strong>: B1 = 5.683 × 10<sup>−3</sup> と 1 よりずっと小さくなります。試料内部の熱拡散は浴の冷却に比べてほぼ瞬時に進み、温度は試料内でほぼ一様です（準等温）。転移は冷却浴の時間スケールに従って進みます。また、s が落ち着くまでの初期の時間スケールは、温度のそれより約 10<sup>5</sup> 倍短いと見積もられています。</p>
+      <p><strong>厚い試料（d = 1.0 cm）</strong>: B1 = 4.803、Bi = 1.25 です。Bi が 1 程度であることは、試料内部の熱抵抗と外部への熱の受け渡しが同程度であることを意味します。熱が拡散する時間スケールは約 287.5 s（約 4.79 分）で、転移の進み方は内部の熱伝導で決まります。</p>
+
+      <h3>厚い試料で前線が上へ進む様子</h3>
+      <p>厚い試料では、転移温度に達する位置（転移温度等温線）が底から上へ移動していきます。ヒューリスティックな解析によると、底面から測った高さが上がるほど到達は遅れますが、上面に近づくにつれて遅れの増え方は鈍ります。高さと到達の遅れの関係をグラフにすると、上に凸の放物線になります。熱は底面からしか逃げないため、底付近では速く進みます。一方、断熱された上面に近づくと温度勾配がほぼゼロになり、進みが遅くなります。完全な方程式を数値的に解くと、この前線が 1.0 cm の円筒の高さ全体を通過するのにかかる時間は約 143.8 s（約 2.4 分）でした。なお薄い試料でも、到達時間は近似的に上に凸の二次曲線を示すとされています。</p>
+      <p>数値計算で得た温度と秩序パラメータの分布（Figure 4）では、次の順に変化が進みます。</p>
+
+      <ol class="timeline">
+        <li class="timeline__step">
+          <p class="timeline__step-title">最初は全体が等方相</p>
+        </li>
+        <li class="timeline__step">
+          <p class="timeline__step-title">境目が試料内を掃いていく</p>
+          <p>冷えるにつれて、等方相とネマチック相の不連続な境目が試料内を掃いていきます。</p>
+        </li>
+        <li class="timeline__step">
+          <p class="timeline__step-title">境目が断熱上面に達する</p>
+          <p>最後にこの境目が断熱上面に達し、ネマチック相としての秩序が増していきます。</p>
+        </li>
+      </ol>
+
+      <div class="callout callout--note">
+        <span class="callout__icon" aria-hidden="true">!</span>
+        <div class="callout__body">
+          <p><strong>著者らの重要な留保：転移温度等温線は、実際の等方相–ネマチック相の境界と一致するとは限りません。</strong>準安定性や配向が落ち着く速さの影響で、転移温度を通過した後も s の変化が遅れることがあるためです。論文は、温度だけから見た予測と、配向秩序そのものの発展とを区別して扱っています。</p>
+        </div>
+      </div>
+
+      <h2>意義と限界</h2>
+      <p>この研究は、分子の向きの変化と熱の伝わり方の連成を、熱力学的に矛盾のない形で記述しました。数学的には、Ball–Majumdar ポテンシャルの陽的な近似とその収束、連成問題の局所的な適定性を確立しています。さらに、配向の緩和・熱拡散・外部冷却の時間スケールが大きく離れていることを示しました。熱拡散時間と冷却時間の比較から、2 つの領域を分ける特性厚さも同定しています。著者らは、試料寸法が変わると冷却中の熱履歴が大きく変わりうることを示した点を意義として挙げています。</p>
+      <p>一方、論文は次の限界を認めています。</p>
+      <ul>
+        <li>モデルはラボスケールの形状を前提にしています。厚い試料は、熱の長さスケールを変えたときの影響を見るために扱ったものです。工業プロセスへ当てはめるには、このモデルにない物理効果を加える必要があります。</li>
+        <li>液体全体の流れは無視しています。</li>
+        <li>扱うのは等方相→ネマチック相の転移だけで、ネマチック相→スメクチック相の転移は対象外です。</li>
+        <li>ITZ の回転粘性は現時点で不明なため、液晶の文献の典型値を使っています。また、転移の近くで比熱が増大する効果は基準値に含めていません。</li>
+        <li>適定性の証明は角を丸めた領域で行っており、角のある実際の円筒での理論は扱っていません。</li>
+      </ul>
+      <p>今後の課題として、スメクチック相への転移を含める拡張が進行中とされています。ITZ では、等方・ネマチック・スメクチックの各相をどの順に通るかが、冷却後の材料状態を決めるうえで重要だからです。そのほか、相の境界の詳しい動き、温度に依存する物性値、核生成の仕組みも挙げられています。</p>
+
+      <h2>まとめ</h2>
+      <p>医薬用液晶 ITZ を底から冷やすときの相転移を、温度と分子の向きを連成させた数理モデルで記述し、その数学的な正しさを証明した研究です。解析の結果、厚さ約 4.56 mm を境に、薄い試料では冷却浴が、厚い試料では内部の熱拡散が転移の進み方を支配することが示されました。試料の大きさが変わると熱履歴が大きく変わりうるという指摘は、冷やし方の設計を考える際の手がかりになります。</p>
+
+    </div>
+
+    <section class="glossary">
+      <h2 class="glossary__title">用語集</h2>
+      <dl>
+        <dt>液晶（liquid crystal）</dt>
+        <dd>液体のように流れつつ、分子の向きにある程度の秩序を持つ状態。温度で液晶相が現れるものをサーモトロピック（thermotropic）と呼びます。</dd>
+
+        <dt>等方相（isotropic phase）</dt>
+        <dd>分子の向きがばらばらな液体の状態。</dd>
+
+        <dt>ネマチック相（nematic phase）</dt>
+        <dd>分子の向きはそろうが、位置には秩序がない液晶相。</dd>
+
+        <dt>スカラー秩序パラメータ（scalar order parameter）s</dt>
+        <dd>分子の向きのそろい具合を表す数。0 が等方、1 が完全にそろった状態。</dd>
+
+        <dt>ダイレクタ（director）</dt>
+        <dd>分子がそろう方向を表す単位ベクトル。</dd>
+
+        <dt>速度論的凍結（kinetic arrest）</dt>
+        <dd>冷却中に分子運動が止まり、相転移が進まないままガラス状態などで固定されること。</dd>
+
+        <dt>Biot 数（Biot number）</dt>
+        <dd>境界での熱の受け渡しと内部の熱伝導の比。</dd>
+
+        <dt>臨界厚さ（d_crit）</dt>
+        <dd>試料内の熱拡散時間と外部冷却の時間が等しくなる厚さ。本論文の条件では約 4.56 mm。</dd>
+
+        <dt>適定性（well-posedness）</dt>
+        <dd>方程式の解が存在し、ただ 1 つに決まり、データに連続的に依存すること。</dd>
+      </dl>
+    </section>
+
+    <section class="paper-link">
+      <p class="paper-link__label">原論文</p>
+      <p class="paper-link__title">Modeling and Analysis of Cooling Induced Isotropic Nematic Transitions in Pharmaceutical Liquid Crystals</p>
+      <p><a href="https://arxiv.org/abs/2611.00273" target="_blank" rel="noopener noreferrer">arXiv:2611.00273 を読む（arxiv.org）</a></p>
+    </section>
+
+    <nav class="article__nav">
+      <a href="../index.html">← 記事一覧へ戻る</a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p>paper-lens — arXiv 論文の日本語解説</p>
+    </div>
+  </footer>
+</body>
+</html>
