@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>薬を含むゲルの「形」を変えると、電気で押し出す薬の通り方が変わる — 5 種類の形状で比べた PPy-PVA ハイドロゲルのイオントフォレシス実験 — paper-lens</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <p class="site-header__title"><a href="../index.html">paper-lens</a></p>
+    </div>
+  </header>
+
+  <main class="article">
+    <figure class="article__cover">
+      <img src="../assets/2026-10-22-2610.31567-geometry-dependent-ppy-pva-hydrogels-iontophoretic-delivery-cover.png"
+           alt="「薬を含むゲルの『形』を変えると、電気で押し出す薬の通り方が変わる」を課題・手法・形で変わる性質・結果の 4 区画で示すインフォグラフィック。課題区画は、皮膚の角層が大きな薬を通さないことと、薬の出方の制御が主に電流密度や波形に頼ってきたことを示す。手法区画は Plain・Circle・Interdigital・Hilbert 2nd・Hilbert 3rd の 5 形状と、陰極面積 175.49 mm²・隙間 1 mm をそろえたこと、モデル薬物 BSA と人工膜の Franz 拡散セルでの測定を示す。性質区画は細孔面積の中央値（Plain 281.66、Hilbert 3rd 87.75 µm²）と最大電場強度（Plain 7.5 × 10³、Hilbert 3rd 1.47 × 10⁴ V/m）を示す。結果区画は増強比 ER（Plain 3.52、Circle 6.98、Interdigital 2.25、Hilbert 2nd 2.25、Hilbert 3rd 2.90）がすべて 1 を上回ったことを示す。">
+    </figure>
+
+    <h1 class="article__title">薬を含むゲルの「形」を変えると、電気で押し出す薬の通り方が変わる — 5 種類の形状で比べた PPy-PVA ハイドロゲルのイオントフォレシス実験</h1>
+    <div class="article__meta">
+      <span>公開日：2026-10-22</span>
+      <span>arXiv：2610.31567</span>
+      <span>カテゴリ：cs.RO / physics.med-ph</span>
+    </div>
+
+    <div class="article__body">
+
+      <h2>この論文のひとことまとめ</h2>
+      <p>皮膚に貼って微弱な電流で薬を送り込む「イオントフォレシス（iontophoresis）」では、これまで主に電流の強さや波形を調整して薬の出方を制御してきました。本論文は、電流ではなく「薬を含んだゲルの形」を変えるという別の手がかりに注目しています。Cornell University の研究チームは、導電性のハイドロゲルを 5 種類の形状で作り分け、形によってゲル内部の細孔の様子と局所的な電場の強さが変わることを確かめました。そのうえで、人工膜を使った実験で、同じ電流条件でも形状ごとに薬の透過特性が異なることを示しています。</p>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <p class="stat__value">5 形状すべて</p>
+          <p class="stat__label">増強比 ER が 1 を上回った（電流が透過を後押し）</p>
+        </div>
+        <div class="stat">
+          <p class="stat__value">6.98</p>
+          <p class="stat__label">増強比 ER の最大値（Circle）</p>
+        </div>
+        <div class="stat">
+          <p class="stat__value">約 2 倍</p>
+          <p class="stat__label">最大電場強度：Hilbert 3rd は Plain の約 2 倍（シミュレーション）</p>
+        </div>
+      </div>
+
+      <h2>なぜこの研究が重要か</h2>
+      <p>飲み薬や注射ではなく、皮膚から薬を届ける「経皮薬物送達（transdermal drug delivery）」は、体への負担が小さく、決められた通りに薬を使い続けやすいという利点があります。一方で、皮膚の一番外側にある角層（stratum corneum）は強固なバリアで、特にタンパク質やペプチドのような大きな薬はほとんど通りません。</p>
+      <p>イオントフォレシスは、この壁を電気の力で越えようとする方法です。ただし薬の出方の制御は、主に電流密度や波形といった電気側の設定に頼ってきました。論文は、ゲルそのものの構造を作り込んで制御する方向は比較的手つかずだったと指摘しています。もし「形」で送達特性を変えられるなら、電流を個別に細かく調整しなくても、既存の手法を補う設計の選択肢が増えることになります。</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <p class="card__title"><span class="badge">これまで</span> 電気側の設定で制御</p>
+          <p>電流密度や波形を調整して、薬の出方を制御してきました。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge badge--accent-2">本研究</span> ゲルの「形」で制御</p>
+          <p>ゲルそのものの構造を作り込む、比較的手つかずだった方向に注目しています。</p>
+        </div>
+      </div>
+
+      <h2>背景：何が問題だったのか</h2>
+      <p>イオントフォレシスでは、微弱な定電流またはパルス電流で電場を作り、電荷を帯びた薬の分子を皮膚の中へ動かします。文献で使われる電流密度は 5 µA cm<sup>-2</sup> から 3 mA cm<sup>-2</sup> まで幅があります。</p>
+      <p>このときのイオンの流れは Nernst-Planck 式で表されます。これは、イオンの流れを「濃度の差による拡散」「電位の差による移動（電気泳動、electromigration）」「液体の流れによる運搬（対流）」の 3 つの和として書く式です。つまり、薬の通りやすさは、薬が通り抜ける道の構造と、そこにかかる電場の強さに左右されます。</p>
+
+      <figure class="diagram">
+        <svg viewBox="0 0 300 300" width="360" role="img" aria-label="Nernst-Planck 式の構成を示す図。濃度の差による拡散、電位の差による移動（電気泳動）、液体の流れによる運搬（対流）の 3 つの和がイオンの流れになる。">
+          <defs>
+            <marker id="np-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L8,3 L0,6 z" fill="var(--color-accent)"></path>
+            </marker>
+          </defs>
+          <rect x="20" y="10" width="260" height="46" rx="8" fill="var(--color-surface)" stroke="var(--color-border)" stroke-width="1.5"></rect>
+          <text x="150" y="39" text-anchor="middle" style="font-size:15px;fill:var(--color-heading)">濃度の差による拡散</text>
+          <text x="150" y="76" text-anchor="middle" style="font-size:18px;font-weight:700;fill:var(--color-text-muted)">＋</text>
+          <rect x="20" y="86" width="260" height="46" rx="8" fill="var(--color-accent-soft)" stroke="var(--color-accent)" stroke-width="1.5"></rect>
+          <text x="150" y="115" text-anchor="middle" style="font-size:15px;fill:var(--color-heading)">電位の差による移動（電気泳動）</text>
+          <text x="150" y="152" text-anchor="middle" style="font-size:18px;font-weight:700;fill:var(--color-text-muted)">＋</text>
+          <rect x="20" y="162" width="260" height="46" rx="8" fill="var(--color-surface)" stroke="var(--color-border)" stroke-width="1.5"></rect>
+          <text x="150" y="191" text-anchor="middle" style="font-size:15px;fill:var(--color-heading)">液体の流れによる運搬（対流）</text>
+          <path d="M150,210 L150,238" fill="none" stroke="var(--color-accent)" stroke-width="1.5" marker-end="url(#np-arrow)"></path>
+          <rect x="20" y="242" width="260" height="48" rx="8" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="2"></rect>
+          <text x="150" y="272" text-anchor="middle" style="font-size:16px;font-weight:700;fill:var(--color-heading)">イオンの流れ</text>
+        </svg>
+        <figcaption class="diagram__caption">Nernst-Planck 式は、イオンの流れを 3 つの和として表す。</figcaption>
+      </figure>
+
+      <p>もう一つの背景は、ゲルの作り方です。本研究では、化学的な架橋剤を使わずに凍結と融解を繰り返してゲル化させる「凍結融解（freeze-thaw, F/T）物理架橋」を用います。この方法では、氷ができて溶ける過程が細孔を作ります。鋳型の中では体積の膨張が内部応力を生むため、できあがるゲルは形状の影響を受けやすいことが知られていました。それでも、鋳型の形がゲルの微細構造や薬の送達性能にどう効くのかは、他の作製条件に比べて調べられていませんでした。</p>
+
+      <h2>提案手法：何をしたのか</h2>
+
+      <h3>中核となる仮説</h3>
+      <p>著者らの仮説は、「鋳型が決めるゲルの形」が間接的な調整つまみになる、というものです。形が変わると、Nernst-Planck 式に現れる 2 つの性質、すなわち (1) ゲル内部の細孔構造と (2) 局所的な電場の強さが変わり、その結果として薬の出方が変わるはずだ、という考え方です。</p>
+
+      <figure class="diagram">
+        <svg viewBox="0 0 300 250" width="360" role="img" aria-label="著者らの仮説を示す図。鋳型が決めるゲルの形が、(1) ゲル内部の細孔構造と (2) 局所的な電場の強さを変え、その結果として薬の出方が変わる。">
+          <defs>
+            <marker id="hy-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L8,3 L0,6 z" fill="var(--color-text-muted)"></path>
+            </marker>
+          </defs>
+          <rect x="50" y="10" width="200" height="48" rx="8" fill="var(--color-accent-soft)" stroke="var(--color-accent)" stroke-width="2"></rect>
+          <text x="150" y="40" text-anchor="middle" style="font-size:16px;font-weight:700;fill:var(--color-heading)">鋳型が決めるゲルの形</text>
+          <path d="M110,58 L80,94" fill="none" stroke="var(--color-text-muted)" stroke-width="1.5" marker-end="url(#hy-arrow)"></path>
+          <path d="M190,58 L220,94" fill="none" stroke="var(--color-text-muted)" stroke-width="1.5" marker-end="url(#hy-arrow)"></path>
+          <rect x="10" y="98" width="134" height="62" rx="8" fill="var(--color-surface)" stroke="var(--color-border)" stroke-width="1.5"></rect>
+          <text x="77" y="124" text-anchor="middle" style="font-size:15px;font-weight:700;fill:var(--color-heading)">(1) 細孔構造</text>
+          <text x="77" y="146" text-anchor="middle" style="font-size:13px;fill:var(--color-text-muted)">ゲル内部</text>
+          <rect x="156" y="98" width="134" height="62" rx="8" fill="var(--color-surface)" stroke="var(--color-border)" stroke-width="1.5"></rect>
+          <text x="223" y="124" text-anchor="middle" style="font-size:15px;font-weight:700;fill:var(--color-heading)">(2) 電場の強さ</text>
+          <text x="223" y="146" text-anchor="middle" style="font-size:13px;fill:var(--color-text-muted)">局所的</text>
+          <path d="M80,160 L120,194" fill="none" stroke="var(--color-text-muted)" stroke-width="1.5" marker-end="url(#hy-arrow)"></path>
+          <path d="M220,160 L180,194" fill="none" stroke="var(--color-text-muted)" stroke-width="1.5" marker-end="url(#hy-arrow)"></path>
+          <rect x="50" y="196" width="200" height="46" rx="8" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="2"></rect>
+          <text x="150" y="225" text-anchor="middle" style="font-size:16px;font-weight:700;fill:var(--color-heading)">薬の出方が変わる</text>
+        </svg>
+        <figcaption class="diagram__caption">形が Nernst-Planck 式に現れる 2 つの性質を変え、それを通じて薬の出方が変わる、という仮説。</figcaption>
+      </figure>
+
+      <p>電場については、物理の基本的な性質を利用しています。導体の鋭い角やエッジ、曲がりの急な部分には電荷が集まりやすく、そこで電場が局所的に強くなります。そこで角を多く作れる形として、空間を埋め尽くすように折れ曲がるフラクタル図形「Hilbert 曲線（原文表記は &quot;Hilbert-Piano curves&quot;）」を電極の形に取り入れました。</p>
+
+      <h3>材料</h3>
+      <ul>
+        <li><strong>ゲル</strong>: 導電性ポリマーのポリピロール（polypyrrole, PPy）を、ポリビニルアルコール（polyvinyl alcohol, PVA）と混ぜた複合ハイドロゲルです。両者を混ぜることで、機械的に強く、イオンを通す導電性も持つゲルになります。</li>
+        <li><strong>モデル薬物</strong>: ウシ血清アルブミン（bovine serum albumin, BSA）を使いました。分子量約 66.5 kDa の球状タンパク質で、インスリンなどの大きな治療用タンパク質の代わりとしてよく用いられます。</li>
+        <li><strong>作製</strong>: PPy のナノ粒子と PVA を混ぜ、BSA を加えて鋳型に流し込み、凍結 24 時間と融解 24 時間を 1 サイクルとして 3 サイクル繰り返します。</li>
+      </ul>
+
+      <h3>5 種類の形状</h3>
+      <p>面積の外枠をそろえたうえで、曲率と角の多さが異なる 5 つの形を用意しました。</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <p class="card__title"><span class="badge">1</span> Plain</p>
+          <p>最も基本的な平面形状。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge">2</span> Circle</p>
+          <p>円形。Plain とともに市販のイオントフォレシス装置で最も一般的な電極構成です。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge">3</span> Interdigital（櫛歯型）</p>
+          <p>静電気で物を吸着させる装置（電気吸着アクチュエータ）で電場を強めるために使われる形に着想したものです。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge badge--accent-2">4・5</span> Hilbert 2nd / Hilbert 3rd</p>
+          <p>Hilbert 曲線から導いた形で、2 段階の複雑さ（原文では 2nd と 3rd）を用意しています。</p>
+        </div>
+      </div>
+
+      <p>公平に比べるため、薬を含む陰極側の面積はすべて 175.49 mm<sup>2</sup>、陰極と陽極の隙間はすべて 1 mm にそろえました。デバイスは、薬を含むゲル（陰極側）、銀/塩化銀（Ag/AgCl）ペーストの電極（陽極側）、蒸発を防ぎ形を保つためのシリコーン樹脂（PDMS）の枠で構成されます。</p>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <p class="stat__value">175.49 mm<sup>2</sup></p>
+          <p class="stat__label">薬を含む陰極側の面積（全形状で共通）</p>
+        </div>
+        <div class="stat">
+          <p class="stat__value">1 mm</p>
+          <p class="stat__label">陰極と陽極の隙間（全形状で共通）</p>
+        </div>
+      </div>
+
+      <h3>評価の流れ</h3>
+      <ol class="timeline">
+        <li class="timeline__step">
+          <p class="timeline__step-title">配合の最適化</p>
+          <p>PPy の割合、BSA の濃度、電流密度を一つずつ変えて、最も良い条件を選びます。</p>
+        </li>
+        <li class="timeline__step">
+          <p class="timeline__step-title">微細構造の観察</p>
+          <p>ゲルを凍結乾燥して断面を電子顕微鏡（SEM）で撮影し、細孔の面積と空隙率（porosity、断面に占める細孔の割合）を求めます。</p>
+        </li>
+        <li class="timeline__step">
+          <p class="timeline__step-title">電場のシミュレーション</p>
+          <p>有限要素解析（Ansys Maxwell）で、5 V の電位差をかけたときの最大電場強度を計算します。</p>
+        </li>
+        <li class="timeline__step">
+          <p class="timeline__step-title">薬の透過実験</p>
+          <p>「Franz 拡散セル（Franz diffusion cell）」という、膜を挟んだ 2 つの部屋の間で物質の透過量を測る装置を使います。膜には皮膚ではなくセルロースアセテートの人工膜を用い、37 ℃で 180 分まで測定しました。電流をかける条件（IP）と、電流をかけず自然な拡散だけに任せる条件（P）を比べています。</p>
+        </li>
+      </ol>
+
+      <p>透過のしやすさは主に次の指標で評価しています。</p>
+      <div class="card-grid">
+        <div class="card">
+          <p class="card__title"><span class="badge">Q</span> 累積透過量</p>
+          <p>単位面積あたりに膜を通り抜けた薬の総量。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge">Jss</span> 擬定常流束</p>
+          <p>透過量がほぼ一定の速さで増える区間での、単位時間あたりの透過量。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge">Papp</span> 見かけの透過係数</p>
+          <p>Jss をゲル内の初期濃度で割って求める、通りやすさの指標。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge badge--accent-2">ER</span> 増強比（enhancement ratio）</p>
+          <p>電流ありの Papp を電流なしの Papp で割った値。1 より大きければ電流が透過を後押ししたことを意味します。</p>
+        </div>
+      </div>
+
+      <div class="callout callout--note">
+        <span class="callout__icon" aria-hidden="true">i</span>
+        <div class="callout__body">
+          <p>なお、PPy と BSA は紫外線の吸収波長が重なるため、そのままでは濃度を区別できません。そこで、測定したスペクトルを両者の成分の足し合わせとして分解する手法（非負最小二乗法、NNLS によるスペクトル分離）で、それぞれの濃度を推定しています。</p>
+        </div>
+      </div>
+
+      <h2>結果：何が分かったのか</h2>
+
+      <h3>配合条件</h3>
+      <div class="stat-grid">
+        <div class="stat">
+          <p class="stat__value">60 wt%</p>
+          <p class="stat__label">PPy の割合（高い導電率とばらつきの小ささの釣り合いが最良）</p>
+        </div>
+        <div class="stat">
+          <p class="stat__value">91.2 ± 9.0%</p>
+          <p class="stat__label">BSA の封入効率の最大値（20 mg mL<sup>-1</sup> のとき）</p>
+        </div>
+        <div class="stat">
+          <p class="stat__value">2 mA cm<sup>-2</sup></p>
+          <p class="stat__label">BSA の移動量が最大（1112 µg cm<sup>-2</sup>）となり、透過実験に採用した電流密度</p>
+        </div>
+      </div>
+      <ul>
+        <li>PPy の割合は 60 wt% が、高い導電率とばらつきの小ささの釣り合いが最も良い条件でした。80 wt% と 90 wt% ではゲルになりませんでした。</li>
+        <li>BSA の封入効率（仕込んだ量のうち実際にゲルに取り込まれた割合）は、20 mg mL<sup>-1</sup> のとき 91.2 ± 9.0% で最大でした。</li>
+        <li>BSA は体内に近い pH で負の電荷を帯び、陽極側へ移動します。電流密度 2 mA cm<sup>-2</sup> で移動量が最大（1112 µg cm<sup>-2</sup>）となったため、透過実験にはこの条件を採用しました。</li>
+        <li>赤外分光（FTIR）の結果からは、BSA がゲルの中でも本来の構造を保っていることが示唆されました。</li>
+      </ul>
+
+      <h3>形状ごとの微細構造と電場</h3>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th scope="col">形状</th>
+            <th scope="col">細孔面積の中央値（µm<sup>2</sup>）</th>
+            <th scope="col">バルク空隙率（%）</th>
+            <th scope="col">最大電場強度（V/m）</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Plain</th>
+            <td>281.66</td>
+            <td>32.78</td>
+            <td>7.5 × 10<sup>3</sup></td>
+          </tr>
+          <tr>
+            <th scope="row">Circle</th>
+            <td>195.06</td>
+            <td>28.75</td>
+            <td>1.14 × 10<sup>4</sup></td>
+          </tr>
+          <tr>
+            <th scope="row">Interdigital</th>
+            <td>106.08</td>
+            <td>19.23</td>
+            <td>1.26 × 10<sup>4</sup></td>
+          </tr>
+          <tr>
+            <th scope="row">Hilbert 2nd</th>
+            <td>234.37</td>
+            <td class="is-best">34.79</td>
+            <td>1.32 × 10<sup>4</sup></td>
+          </tr>
+          <tr>
+            <th scope="row">Hilbert 3rd</th>
+            <td>87.75</td>
+            <td>30.37</td>
+            <td class="is-best">1.47 × 10<sup>4</sup></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>細孔の大きさは形によってはっきり異なりました。Plain が最も大きく、Hilbert 3rd が最も小さく、Hilbert 3rd はばらつきも最小で、より均一な構造でした。空隙率は Hilbert 2nd と Plain が高く、Interdigital が最低でした。また、同じゲルの中でも、幅の狭い部分と広い部分で空隙率が大きく違う形状が多く見られました。たとえば Hilbert 2nd では、局所的な空隙率が 37.2% の部分と 2.8% の部分がありました。</p>
+      <p>電場のシミュレーションでは、角や曲がりの多い 4 形状で電場が局所的に強まる「ホットスポット」が現れました。最大電場強度は Hilbert 3rd が最も高く、Plain の約 2 倍でした。</p>
+
+      <div class="callout">
+        <span class="callout__icon" aria-hidden="true">!</span>
+        <div class="callout__body">
+          <p>ただし、このシミュレーションはゲル内部を均質と仮定し、5 V の定電位で計算しています。実際の透過実験は 2 mA cm<sup>-2</sup> の定電流で行っており、条件が同じではない点に注意が必要です。</p>
+        </div>
+      </div>
+
+      <h3>薬の透過</h3>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th scope="col">形状</th>
+            <th scope="col">Q：電流あり（µg cm<sup>-2</sup>）</th>
+            <th scope="col">Q：電流なし（µg cm<sup>-2</sup>）</th>
+            <th scope="col">Jss：電流あり（µg cm<sup>-2</sup> h<sup>-1</sup>）</th>
+            <th scope="col">ER</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Plain</th>
+            <td>3883</td>
+            <td>3086</td>
+            <td>4602</td>
+            <td>3.52</td>
+          </tr>
+          <tr>
+            <th scope="row">Circle</th>
+            <td>3012</td>
+            <td>820.8</td>
+            <td>3788</td>
+            <td class="is-best">6.98</td>
+          </tr>
+          <tr>
+            <th scope="row">Interdigital</th>
+            <td>1453</td>
+            <td>1708</td>
+            <td>1346</td>
+            <td>2.25</td>
+          </tr>
+          <tr>
+            <th scope="row">Hilbert 2nd</th>
+            <td>3576</td>
+            <td>3262</td>
+            <td>2052</td>
+            <td>2.25</td>
+          </tr>
+          <tr>
+            <th scope="row">Hilbert 3rd</th>
+            <td>2872</td>
+            <td>1907</td>
+            <td>1891</td>
+            <td>2.90</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>（Q は 3 時間後の累積量で、各形状 3 サンプルの平均値。ばらつきの大きさは後述の通りです）</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <p class="card__title"><span class="badge">電流あり</span> 平均の累積透過量 Q</p>
+          <p>2959 ± 937 µg cm<sup>-2</sup></p>
+          <p>平均 Papp：(3.80 ± 1.93) × 10<sup>-5</sup> cm s<sup>-1</sup></p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge badge--accent-2">電流なし</span> 平均の累積透過量 Q</p>
+          <p>2158 ± 1016 µg cm<sup>-2</sup></p>
+          <p>平均 Papp：(1.11 ± 0.44) × 10<sup>-5</sup> cm s<sup>-1</sup></p>
+        </div>
+      </div>
+
+      <ul>
+        <li><strong>電流をかけると全体として透過が増えました。</strong> 5 形状の平均の累積透過量は、電流ありで 2959 ± 937、電流なしで 2158 ± 1016 µg cm<sup>-2</sup> でした。平均の Papp も、電流ありが (3.80 ± 1.93) × 10<sup>-5</sup> cm s<sup>-1</sup>、電流なしが (1.11 ± 0.44) × 10<sup>-5</sup> cm s<sup>-1</sup> です。</li>
+        <li><strong>増強比 ER はすべての形状で 1 を上回りました。</strong> 最大は Circle の 6.98 でした。</li>
+        <li><strong>Hilbert 2nd</strong> は高い電場強度と比較的高い空隙率をあわせ持ち、累積透過量も最も高い部類でした。</li>
+        <li><strong>Interdigital</strong> は、電流なしの方が累積透過量が多かった唯一の形状でした。空隙率が最も低かった形状でもあります。</li>
+        <li><strong>Hilbert 3rd</strong> は、電場強度は最大でしたが一定速度の流束 Jss は低めでした。著者らは、一定の速さで透過する区間が短いためと考え、総量は多くても長時間一定量を投与する用途には予測しにくいと解釈しています。</li>
+        <li>電流なしの条件では Plain の流束が最大で、空隙率の高さや細孔の大きさとの関連が示唆されました。</li>
+        <li>どの条件でも、透過が始まるまでの遅れ（ラグタイム）は最長でも約 5 分と小さく、輸送はほぼ開始直後から始まっていました。</li>
+      </ul>
+
+      <div class="callout callout--note">
+        <span class="callout__icon" aria-hidden="true">i</span>
+        <div class="callout__body">
+          <p><strong>Interdigital で Q と ER の向きが一致しない理由</strong>：Interdigital は電流なしの方が累積透過量が多かったにもかかわらず、ER は 1 を上回ります。これは、ER が 3 時間後の総量 Q ではなく、一定速度で透過する区間の流束 Jss から求めた Papp の比だからです。Interdigital の Jss は電流ありで 1346、電流なしで 597 µg cm<sup>-2</sup> h<sup>-1</sup> と電流ありの方が高く、そのため Q の大小と ER の向きが一致しない結果になっています。</p>
+        </div>
+      </div>
+
+      <p>著者らは、電流ありの平均 Papp が、先行研究で報告されたペプチドや、より小さく動きやすいニコチンの値より高かったと述べています。ただし、先行研究の一部は切除したヒトの皮膚を使っており、本研究は人工膜を使っているため、この差は膜の違いによる可能性があると著者自身が付記しています。</p>
+      <p>形状ごとの性質と透過指標の関係は順位相関（Spearman 相関）でも調べていますが、形状数が 5 つしかないため信頼区間が非常に広く、著者らは「定性的な傾向」「探索的」な分析と位置づけています。</p>
+
+      <h2>意義と限界</h2>
+      <p>この研究の意義は、イオントフォレシスの薬の出方を、電流の設定だけでなく「ゲルの形」でも調整できる可能性を示した点にあります。著者らは、形状による制御は個別の電流密度制御を必要とせずに既存の手法を補完できるとし、大きな分子の薬を届けるゲル型経皮システムの設計指針になると述べています。形が細孔構造と電場の両方を同時に変えるという視点も、設計の考え方として示唆的です。</p>
+      <p>一方で、論文は多くの限界を自ら挙げています。</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <p class="card__title"><span class="badge badge--accent-2">限界</span> サンプル数が少なく、ばらつきが大きい</p>
+          <p>各条件 3 サンプルで、特に電流なしの累積量や電流ありの流束のばらつきが大きくなっています。物理架橋の過程に由来する可能性があり、形状による差は探索的な結果として、より多くのサンプルでの確認が必要とされています。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge badge--accent-2">限界</span> 人工膜での結果である</p>
+          <p>人工膜と実際の皮膚は構造も輸送の性質も大きく異なり、結果を生体の皮膚にそのまま当てはめることはできません。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge badge--accent-2">限界</span> シミュレーションと実態のずれ</p>
+          <p>シミュレーションは角で電場が最大になると予測しますが、SEM では端の近くに緻密な壁のような表面層ができており、イオンの移動を妨げる可能性があります。計算上の高い電場が、実際に効いている電場の強さを意味するとは限りません。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge badge--accent-2">限界</span> SEM は各形状 1 試料のみ</p>
+          <p>試料ごとのばらつきは捉えられていません。</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <span class="callout__icon" aria-hidden="true">!</span>
+        <div class="callout__body">
+          <p><strong>電流密度は安全基準ではない</strong>：実験の電流密度は透過量を最大化する目的で選んだもので、生体での安全な上限とみなすべきではありません。高い電流密度は組織を傷めるおそれがあります。</p>
+        </div>
+      </div>
+
+      <p>今後の課題として、化学架橋による網目構造の利用、実際に効いている電場強度の定量、X 線 CT による細孔のつながりや曲がり具合の 3 次元評価が挙げられています。生体での使用に向けては、皮膚の電気抵抗に応じた電流密度や電極間隔の調整、漏れを防ぎ水分を保つ粘着性の枠の改良も必要とされています。</p>
+
+      <h2>まとめ</h2>
+      <p>本論文は、凍結融解で作る導電性ハイドロゲルの形を 5 種類に変えることで、ゲル内部の細孔構造と局所電場が変わり、薬の透過特性が形状ごとに異なることを人工膜の実験で示しました。電流をかけるとすべての形状で透過が後押しされましたが、どの形が有利かは指標によって異なります。サンプル数や人工膜という制約があるため、現時点では「形も設計のつまみになり得る」ことを示した探索的な成果と捉えるのが妥当です。</p>
+
+    </div>
+
+    <section class="glossary">
+      <h2 class="glossary__title">用語集</h2>
+      <dl>
+        <dt>イオントフォレシス（iontophoresis）</dt>
+        <dd>微弱な電流で電場を作り、電荷を帯びた薬を皮膚に透過させる方法。</dd>
+        <dt>角層（stratum corneum）</dt>
+        <dd>皮膚の一番外側の層。多くの薬に対して強いバリアになる。</dd>
+        <dt>Nernst-Planck 式</dt>
+        <dd>イオンの流れを、拡散・電位差による移動・液体の流れによる運搬の和として表す式。</dd>
+        <dt>凍結融解（freeze-thaw）物理架橋</dt>
+        <dd>化学架橋剤を使わず、凍結と融解を繰り返して PVA をゲル化させる方法。氷の形成と融解が細孔を作る。</dd>
+        <dt>Hilbert 曲線</dt>
+        <dd>空間を埋め尽くすように折れ曲がるフラクタル曲線。角が多く、電場を局所的に集中させるのに使われた。</dd>
+        <dt>Franz 拡散セル（Franz diffusion cell）</dt>
+        <dd>膜を挟んだ 2 つの部屋の間で、物質がどれだけ透過したかを測る実験装置。</dd>
+        <dt>見かけの透過係数（Papp）</dt>
+        <dd>一定速度での透過量をゲル内の初期濃度で割った、通りやすさの指標。</dd>
+        <dt>増強比（enhancement ratio, ER）</dt>
+        <dd>電流ありの Papp を電流なしの Papp で割った値。</dd>
+      </dl>
+    </section>
+
+    <section class="paper-link">
+      <p class="paper-link__label">原論文</p>
+      <p class="paper-link__title">Geometry-Dependent Properties of Physically Crosslinked PPy-PVA Hydrogels Enable Tunable Iontophoretic Drug Delivery</p>
+      <p><a href="https://arxiv.org/abs/2610.31567" target="_blank" rel="noopener noreferrer">arXiv:2610.31567 を読む（arxiv.org）</a></p>
+    </section>
+
+    <nav class="article__nav">
+      <a href="../index.html">← 記事一覧へ戻る</a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p>paper-lens — arXiv 論文の日本語解説</p>
+    </div>
+  </footer>
+</body>
+</html>
