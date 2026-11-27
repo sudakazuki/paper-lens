@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>細い管で「広がり方」を測って粒子の大きさを知る — テイラー分散解析（TDA）を検出器ごとに整理した総説 — paper-lens</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <p class="site-header__title"><a href="../index.html">paper-lens</a></p>
+    </div>
+  </header>
+
+  <main class="article">
+    <figure class="article__cover">
+      <img src="../assets/2026-10-21-2610.30039-taylor-dispersion-analysis-advanced-detection-cover.png"
+           alt="「細い管で『広がり方』を測って粒子の大きさを知る」を 4 つの区画で示すインフォグラフィック。総説（レビュー論文）であることを示すラベルの下に、1「TDA の仕組み」は、中心は速く壁際は遅い流れで試料の帯が広がり、小さい分子は拡散が速く帯が細く、大きい分子は拡散が遅く帯が広いことと、ピーク幅 → 拡散係数 D → 流体力学的半径 Rh の流れを示す。2「利点と弱点」は、試料がごく少量（ナノリットル単位）、大きい粒子側に結果が偏らない、標準試料による校正が不要という利点と、弱点は「検出」であることを示す。3「検出器ごとの使い分け」は UV・蛍光・ESI-MS・ICP-MS の向いている用途と制約、研究の大部分は UV と蛍光が占めることを示す。4「結論」は、実際の使用条件下（たとえば血液の中）での分析はまだ課題で、検出器の組み合わせが空白を埋め得ることを示す。">
+    </figure>
+
+    <h1 class="article__title">細い管で「広がり方」を測って粒子の大きさを知る — テイラー分散解析（TDA）を検出器ごとに整理した総説</h1>
+    <div class="article__meta">
+      <span>公開日：2026-10-21</span>
+      <span>arXiv：2610.30039</span>
+      <span>カテゴリ：q-bio.BM</span>
+      <span>著者：Rami Laoufi, Agnès Hagège</span>
+    </div>
+
+    <div class="article__body">
+
+      <h2>この論文のひとことまとめ</h2>
+      <p>この論文は、タンパク質・抗体・ナノ粒子・薬を運ぶナノキャリアなどの「溶液の中での大きさ」を測る手法、テイラー分散解析（Taylor Dispersion Analysis, TDA）についての総説（レビュー論文）です。新しい手法や実験を提案するものではありません。TDA と組み合わせて使われてきた検出器（UV、屈折率系、SPR、伝導度、蛍光、ICP-MS、ESI-MS、多重検出）ごとに過去の研究を整理しています。そのうえで、「何を知りたいか」によって選ぶべき検出器がどう変わるかをまとめています。なお、著者自身が「網羅的なレビューではない」と明記しています。</p>
+
+      <div class="callout callout--note">
+        <span class="callout__icon" aria-hidden="true">i</span>
+        <div class="callout__body">
+          <p><span class="badge">総説</span> 本論文は新しい手法や実験を提案するものではなく、TDA と組み合わせてきた検出器ごとに過去の研究を整理したレビューです。整理の対象は <span class="badge">UV</span> <span class="badge">屈折率系</span> <span class="badge">SPR</span> <span class="badge">伝導度</span> <span class="badge">蛍光</span> <span class="badge">ICP-MS</span> <span class="badge">ESI-MS</span> <span class="badge">多重検出</span> です。</p>
+        </div>
+      </div>
+
+      <h2>なぜこの研究が重要か</h2>
+      <p>医薬品は、昔ながらの低分子薬だけではなくなりました。ペプチドやタンパク質、モノクローナル抗体、抗体薬物複合体（ADC）、mRNA などの核酸医薬、金属ナノ粒子、脂質ナノ粒子やリポソームといった薬物送達システム（DDS）へと多様化しています。</p>
+      <p>こうした薬では「大きさ」がとても重要なパラメータです。大きさによって、体内のバリアを通れるか、体のどこに分布するか、腎臓からどれだけ早く排出されるかが変わります。小さいことは安全面で大切ですが、排出が速すぎると標的に作用する時間が足りなくなることもあります。</p>
+      <p>大きさの測定は、品質の監視にも使われます。たとえばタンパク質が凝集（くっついて塊になること）すると、免疫反応を引き起こすおそれがあります。そのため製造のあらゆる段階で監視が必要です。また、大きさの変化から、薬と抗体がどれくらい強く結合するか（親和定数）を求める研究も多くあります。</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <p class="card__title"><span class="badge">1</span> 体内でのふるまい</p>
+          <p>体内のバリアを通れるか、どこに分布するか、腎臓からどれだけ早く排出されるかが大きさで変わります。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge">2</span> 品質の監視</p>
+          <p>タンパク質の凝集は免疫反応を引き起こすおそれがあり、製造のあらゆる段階で監視が必要です。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge">3</span> 結合の強さ</p>
+          <p>大きさの変化から、薬と抗体がどれくらい強く結合するか（親和定数）を求める研究も多くあります。</p>
+        </div>
+      </div>
+
+      <h2>背景：何が問題だったのか</h2>
+
+      <h3>2 種類の「大きさ」</h3>
+      <p>論文はまず、大きさには 2 種類あると整理しています。1 つは電子顕微鏡（TEM）で測る、物理的に占める「実際の」大きさです。もう 1 つは、液体の中で実際にふるまうときの実効的な大きさで、流体力学的サイズ（hydrodynamic size）と呼ばれます。粒子のまわりに溶媒がまとわりつく度合いなどで、両者は大きく異なることがあります。生体内での挙動を考えるうえでは、後者が最も関連性が高いとされています。</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <p class="card__title"><span class="badge">TEM</span> 「実際の」大きさ</p>
+          <p>電子顕微鏡で測る、物理的に占める大きさ。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge badge--accent-2">液中</span> 流体力学的サイズ</p>
+          <p>液体の中で実際にふるまうときの実効的な大きさ。生体内での挙動を考えるうえで最も関連性が高いとされます。</p>
+        </div>
+      </div>
+
+      <h3>既存のサイズ測定法とその弱点</h3>
+      <p>流体力学的サイズを測る方法はいくつもあります。論文が挙げる主なものは次のとおりです。</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <p class="card__title">サイズで分離する方法（SEC / AF4）</p>
+          <p><strong>特徴：</strong>サイズ排除クロマトグラフィー（SEC）は 100〜200 nm 以下が対象。フィールドフロー分画（特に非対称流フィールドフロー分画、AF4）はもっと大きな対象（数十 µm オーダー）に使える</p>
+          <p><strong>弱点：</strong>どちらもサイズの標準試料が必要で、カラムや膜との相互作用で試料が失われることがある</p>
+        </div>
+        <div class="card">
+          <p class="card__title">動的光散乱（DLS, Dynamic Light Scattering）</p>
+          <p><strong>特徴：</strong>水系の溶液では堅牢で日常的に使われ、装置も普及している</p>
+          <p><strong>弱点：</strong>散乱の強さが半径の 6 乗に比例するため、大きな凝集体が少しでもあると平均サイズが大きい側に引っ張られる。目的の物質以外の信号も拾ってしまうため、血液のような生体媒体での測定は極めて難しいとされる</p>
+        </div>
+        <div class="card">
+          <p class="card__title">ナノ粒子トラッキング解析（NTA）</p>
+          <p><strong>特徴：</strong>粒子を 1 個ずつカメラで追えるので DLS より分解能が高い</p>
+          <p><strong>弱点：</strong>測れるサイズ範囲が限られ、特に小さい側が苦手</p>
+        </div>
+        <div class="card">
+          <p class="card__title">蛍光相関分光（FCS）/ 蛍光相互相関分光（FCCS）</p>
+          <p><strong>特徴：</strong>蛍光の揺らぎから測る</p>
+          <p><strong>弱点：</strong>蛍光体や蛍光標識が必要</p>
+        </div>
+        <div class="card">
+          <p class="card__title">拡散 NMR（DOSY）</p>
+          <p><strong>弱点：</strong>測定時間が比較的長く、ナノ粒子では感度の低さが致命的になり得る</p>
+        </div>
+      </div>
+
+      <h3>TDA の利点と、残された弱点</h3>
+      <p>こうした中で TDA には次のような利点があると整理されています。</p>
+      <ul>
+        <li>試料がごく少量（ナノリットル単位）で済む。</li>
+        <li>混ざりものがあっても、大きい粒子側に結果が偏らない。</li>
+        <li>標準試料を使った校正が要らない。</li>
+        <li>多くの種類の検出器と比較的簡単に組み合わせられる。</li>
+      </ul>
+
+      <div class="callout">
+        <span class="callout__icon" aria-hidden="true">!</span>
+        <div class="callout__body">
+          <p>一方で、検出が TDA の大きな弱点の一つだと論文は指摘します。検出器ごとに感度の限界があり、そのうえ注入する試料が非常に少ないため、感度の問題がさらに厳しくなるからです。本総説が「検出器」に焦点を当てているのはこのためです。</p>
+        </div>
+      </div>
+
+      <h2>提案手法：何をしたのか</h2>
+      <p>本論文は総説なので、新しい手法はありません。ここでは、レビューの進め方と、論文が解説している TDA の仕組みを紹介します。</p>
+
+      <h3>レビューの進め方</h3>
+      <ol class="timeline">
+        <li class="timeline__step">
+          <p class="timeline__step-title">対象と期間</p>
+          <p>対象は英語の学術誌に掲載された論文のみで、データ収集期間は 2026 年 6 月 1 日〜9 月 14 日です。</p>
+        </li>
+        <li class="timeline__step">
+          <p class="timeline__step-title">キーワード検索</p>
+          <p>Web of Science で「Taylor Dispersion Analysis」「Flow-Induced Dispersion Analysis」というキーワードで集め、無関係な分野を除きました。</p>
+        </li>
+        <li class="timeline__step">
+          <p class="timeline__step-title">メーカー情報の統合</p>
+          <p>市販装置メーカー（Malvern、Fidabio、Nanoscalemetrix）のサイト情報も統合し、重複を除いています。アプリケーションノートは含めていません。</p>
+        </li>
+        <li class="timeline__step">
+          <p class="timeline__step-title">独立した選定</p>
+          <p>著者 2 名がそれぞれ独立に論文を選び、意見が分かれたものは協議で決めました。</p>
+        </li>
+        <li class="timeline__step">
+          <p class="timeline__step-title">採用条件</p>
+          <p>「TDA の検出に何らかの形で関わる」か「生物医薬分野での用途が明記されている」のどちらかを満たすことです。</p>
+        </li>
+      </ol>
+
+      <h3>TDA の仕組み：細い管の中の「広がり方」を見る</h3>
+      <p>TDA の土台は、1953 年に Sir Geoffrey Taylor が記述したテイラー分散（Taylor dispersion）という現象です。</p>
+      <p>細い管（キャピラリー）に液体をゆっくり流すと、流れは層流になり、速度は放物線状の分布になります。管の中心がいちばん速く、壁際はほとんど止まっています。ここに試料を少しだけ注入すると、中心にいる分子は先へ進み、壁際の分子は取り残されます。</p>
+      <p>ただし分子は、管の半径方向にも拡散（ランダムに動き回ること）します。中心の分子は壁側に移って減速し、壁側の分子は中心へ移って加速します。この結果、各分子の速度は平均速度のまわりで揺れ動き、試料の帯は一定の規則で広がっていきます。</p>
+
+      <figure class="diagram">
+        <svg viewBox="0 0 300 330" width="360" role="img" aria-label="TDA で大きさを求める流れを示す図。細い管に試料を注入すると層流で速度が放物線状になり、半径方向の拡散で試料の帯が一定の規則で広がる。出口で検出されるガウス型ピーク（テイラーグラム）の幅から拡散係数 D を求め、ストークス–アインシュタイン式で流体力学的半径 Rh に換算する。">
+          <defs>
+            <marker id="tda-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L8,3 L0,6 z" fill="var(--color-accent)"></path>
+            </marker>
+          </defs>
+          <rect x="20" y="10" width="260" height="56" rx="8" fill="var(--color-surface)" stroke="var(--color-border)" stroke-width="1.5"></rect>
+          <text x="150" y="34" text-anchor="middle" style="font-size:15px;font-weight:700;fill:var(--color-heading)">細い管に試料を注入</text>
+          <text x="150" y="55" text-anchor="middle" style="font-size:13px;fill:var(--color-text-muted)">層流で速度は放物線状の分布</text>
+          <path d="M150,66 L150,84" fill="none" stroke="var(--color-accent)" stroke-width="1.5" marker-end="url(#tda-arrow)"></path>
+          <rect x="20" y="88" width="260" height="56" rx="8" fill="var(--color-surface)" stroke="var(--color-border)" stroke-width="1.5"></rect>
+          <text x="150" y="112" text-anchor="middle" style="font-size:15px;font-weight:700;fill:var(--color-heading)">半径方向の拡散</text>
+          <text x="150" y="133" text-anchor="middle" style="font-size:13px;fill:var(--color-text-muted)">試料の帯が一定の規則で広がる</text>
+          <path d="M150,144 L150,162" fill="none" stroke="var(--color-accent)" stroke-width="1.5" marker-end="url(#tda-arrow)"></path>
+          <rect x="20" y="166" width="260" height="56" rx="8" fill="var(--color-accent-soft)" stroke="var(--color-accent)" stroke-width="1.5"></rect>
+          <text x="150" y="190" text-anchor="middle" style="font-size:15px;font-weight:700;fill:var(--color-heading)">テイラーグラムのピーク幅</text>
+          <text x="150" y="211" text-anchor="middle" style="font-size:13px;fill:var(--color-text-muted)">ガウス型ピーク → 拡散係数 D</text>
+          <path d="M150,222 L150,240" fill="none" stroke="var(--color-accent)" stroke-width="1.5" marker-end="url(#tda-arrow)"></path>
+          <rect x="20" y="244" width="260" height="76" rx="8" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="2"></rect>
+          <text x="150" y="268" text-anchor="middle" style="font-size:15px;font-weight:700;fill:var(--color-heading)">流体力学的半径 Rh</text>
+          <text x="150" y="289" text-anchor="middle" style="font-size:13px;fill:var(--color-text-muted)">ストークス–アインシュタイン式</text>
+          <text x="150" y="309" text-anchor="middle" style="font-size:13px;fill:var(--color-text-muted)">D = k_B T/(6πηRh)</text>
+        </svg>
+        <figcaption class="diagram__caption">TDA は大きさそのものを見るのではなく、液中での動きやすさ（拡散係数）から大きさを逆算する。</figcaption>
+      </figure>
+
+      <p>ポイントは、<strong>拡散が速い小さな分子ほど帯は細く、拡散が遅い大きな分子ほど帯は広くなる</strong>ことです。出口で検出される信号はガウス型（釣り鐘型）のピークになり、「テイラーグラム（taylorgram）」と呼ばれます。このピークの幅から拡散係数 D を求めます。</p>
+
+      <figure class="diagram">
+        <svg viewBox="0 0 320 190" width="380" role="img" aria-label="テイラーグラムの概念図。拡散が速い小さな分子は細いピーク、拡散が遅い大きな分子は広いピークになる。">
+          <line x1="10" y1="140" x2="150" y2="140" stroke="var(--color-border)" stroke-width="1.5"></line>
+          <line x1="170" y1="140" x2="310" y2="140" stroke="var(--color-border)" stroke-width="1.5"></line>
+          <path d="M15,140 C58,140 66,30 80,30 C94,30 102,140 145,140" fill="var(--color-accent-soft)" stroke="var(--color-accent)" stroke-width="2"></path>
+          <path d="M172,140 C215,140 222,62 240,62 C258,62 265,140 308,140" fill="var(--color-accent-soft)" stroke="var(--color-accent)" stroke-width="2"></path>
+          <text x="80" y="162" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--color-heading)">小さな分子</text>
+          <text x="80" y="181" text-anchor="middle" style="font-size:12px;fill:var(--color-text-muted)">拡散が速い → 帯は細い</text>
+          <text x="240" y="162" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--color-heading)">大きな分子</text>
+          <text x="240" y="181" text-anchor="middle" style="font-size:12px;fill:var(--color-text-muted)">拡散が遅い → 帯は広い</text>
+        </svg>
+        <figcaption class="diagram__caption">テイラーグラム（ガウス型ピーク）の幅の違いの概念図。</figcaption>
+      </figure>
+
+      <p>求めた拡散係数は、ストークス–アインシュタイン式（Stokes–Einstein equation）<code>D = k_B T/(6πηRh)</code> で流体力学的半径 Rh に換算します。式中の k_B はボルツマン定数、T は温度、η は溶媒の粘度（粘り気）を表します。つまり、測定時の温度と溶媒の粘度が分かっていれば、拡散係数から半径が一つに決まります。ここで Rh は「その拡散係数をもつ球の半径」として定義されます。つまり TDA は、大きさそのものを見るのではなく、<strong>液中での動きやすさから大きさを逆算する</strong>方法です。</p>
+
+      <p>この解析が成り立つには条件があります。論文は、流れによる運搬（移流）と拡散の比を表す無次元数であるペクレ数（Péclet number）が 40 以上であること、無次元化した拡散時間が 2.5 以上であることを挙げています。</p>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <p class="stat__value">40 以上</p>
+          <p class="stat__label">ペクレ数（移流と拡散の比を表す無次元数）</p>
+        </div>
+        <div class="stat">
+          <p class="stat__value">2.5 以上</p>
+          <p class="stat__label">無次元化した拡散時間</p>
+        </div>
+      </div>
+
+      <p>大きさの異なる成分が混ざっている場合、信号は複数のガウス型ピークの重ね合わせになります。適切なデータ処理をすれば、多分散試料（大きさがばらばらな試料）の分布全体を得られることも先行研究で示されています。</p>
+
+      <h3>変法：FIDA</h3>
+      <p>TDA の変法として FIDA（Flow-Induced Dispersion Analysis）も紹介されています。これは小さな結合相手（プローブ）を、大きな生体分子を含む液に注入する方法です。プローブが相手に結合すると、見かけの拡散係数が変わります。この変化を相互作用の指標として使い、速い生体分子間相互作用の研究に向いています。たとえば、抗体が小さなプローブを認識する性質を利用して、抗体の濃度を求める例が示されています。</p>
+
+      <h2>結果：何が分かったのか</h2>
+      <p>総説のため独自の実験結果はありません。ここでは、検出器ごとに整理された先行研究の知見を紹介します。</p>
+
+      <h3>UV 検出：最も普及しているが、測れる物質が限られる</h3>
+      <p>UV（紫外吸収）検出器は、市販のキャピラリー電気泳動装置のものをそのまま使えるため、広く普及しています。ポリマー、ペプチドやタンパク質、アミロイド凝集体、DNA 複合体、ナノ粒子、mRNA を包んだ脂質ナノ粒子、造影剤などに使われてきました。論文の表には、mRNA 封入脂質ナノ粒子で流体力学的直径 86 nm、Gd 系造影剤で 1〜2.2 nm といった代表例がまとめられています。</p>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <p class="stat__value">86 nm</p>
+          <p class="stat__label">mRNA 封入脂質ナノ粒子の流体力学的直径（論文の表の代表例）</p>
+        </div>
+        <div class="stat">
+          <p class="stat__value">1〜2.2 nm</p>
+          <p class="stat__label">Gd 系造影剤（論文の表の代表例）</p>
+        </div>
+      </div>
+
+      <p>主な限界は、UV をよく吸収する分子が少ないことです。そのため、性質のよく分かったバッファー（緩衝液）中で、比較的高い濃度の試料を測る用途が中心になります。感度を上げる工夫として、次のものが挙げられています。</p>
+      <ul>
+        <li>小さな試料帯を注入する通常の方式（プラグ注入）ではなく「フロンタルモード」を使い、希釈の影響を避ける。</li>
+        <li>流速を下げる。ただし検出限界はわずかしか下がらず、分析時間が延びる。</li>
+        <li>検出の直前に化学的な処理（誘導体化）を施す。炭水化物の検出例があるが、液を高い pH（約 12〜13）にする必要がある。</li>
+      </ul>
+
+      <h3>UV を吸収しない物質向けの検出器</h3>
+      <div class="card-grid">
+        <div class="card">
+          <p class="card__title"><span class="badge">RI</span> 屈折率検出</p>
+          <p>ほぼすべての物質で信号が出ますが、溶液全体の性質を見るため特定の溶質を区別できず、混合物の測定やキャピラリー TDA には向きません。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge">BSI</span> 後方散乱干渉法（Backscattering Interferometry）</p>
+          <p>屈折率の変化を光学的に捉え、キャピラリー上で測れます。UV を吸収しない多糖類を分析できましたが、感度は比較的低く、フロンタルモードでの検出限界は約 50〜80 mg/L と報告されています。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge">D-SPR</span> 表面プラズモン共鳴（SPR）を使う方法</p>
+          <p>市販 SPR 装置の導入管を長くするだけで、そこでテイラー分散を起こせます。インスリンやアルブミンなどの拡散係数が求められています。ただし SPR はセンサー表面近く（約 100〜200 nm）の液を見ているため、真の「溶液全体」の測定とはみなせないという指摘があります。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge">C4D</span> 非接触伝導度検出</p>
+          <p>電気を帯びた物質に向きます。ただし実用上は、モル質量 10<sup>5</sup> g/mol 未満の高分子電解質に限られるとされます。</p>
+        </div>
+      </div>
+      <p>これらを組み合わせれば多くの物質を測れますが、一般に高濃度で、純粋なバッファー中で測ることが前提になります。</p>
+
+      <h3>蛍光検出：選択性が高く、複雑な液でも測れる</h3>
+      <p>蛍光検出は最も高感度な光学検出法の一つで、TDA 用の市販装置にも搭載されています。ただし、試料が自ら光るか、蛍光標識（タグ）を付ける必要があります。標識そのものが大きさを変えてしまうおそれもあります。実際、アミロイドペプチドに付けた標識が凝集の過程を変えた例や、細胞外小胞（EV）で標識操作がサイズ変化を招き得るという例が紹介されています。</p>
+      <p>一方で、狙った物質だけを見られる（選択性が高い）ため、血漿や希釈した血清、発酵液のような複雑な液でも測定できます。85% 血清を使っても精度にほとんど影響しなかったという研究もあります（ただし論文中の表では同じ研究の媒体が「85% plasma（血漿）」と記されており、表記が揺れています）。こうした性質から、蛍光 TDA は相互作用を調べる製薬分野の日常的な手法になりつつあるとされます。用途は、バイオマーカーの定量、親和定数の決定、ナノ粒子表面にタンパク質がまとわりつく「プロテインコロナ」の形成評価などです。</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <p class="card__title"><span class="badge">強み</span> 高い選択性</p>
+          <p>狙った物質だけを見られるため、血漿や希釈した血清、発酵液のような複雑な液でも測定できます。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge badge--accent-2">注意</span> 標識の影響</p>
+          <p>多くの場合標識が必要で、標識そのものが大きさを変えてしまうおそれがあります。</p>
+        </div>
+      </div>
+
+      <h3>ICP-MS：金属を含む粒子なら生体試料のまま測れる</h3>
+      <p>誘導結合プラズマ質量分析（ICP-MS）は、元素を見分けて検出する方法です。標識は不要ですが、金属を含む化合物やナノ粒子に限られます。市販の接続部品がないこともあり、報告は数件にとどまります。</p>
+      <p>それでも、UV で測った値との一致は非常に良好です。また装置の堅牢さから、生体試料の影響（マトリックス効果）を乗り越えられます。Gd 系ナノ粒子の大きさを血清・尿・脳脊髄液の中で希釈せずに測った例や、最大 50 mg/mL のタンパク質を含む液で金ナノ粒子のプロテインコロナ形成を評価した例があります。</p>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <p class="stat__value">希釈なし</p>
+          <p class="stat__label">Gd 系ナノ粒子の大きさを血清・尿・脳脊髄液の中で測定</p>
+        </div>
+        <div class="stat">
+          <p class="stat__value">最大 50 mg/mL</p>
+          <p class="stat__label">タンパク質を含む液で金ナノ粒子のプロテインコロナ形成を評価</p>
+        </div>
+      </div>
+
+      <h3>ESI-MS：複数の成分を同時に見分けられる</h3>
+      <p>エレクトロスプレーイオン化質量分析（ESI-MS）は、標識なしで選択性と感度を両立し、複数成分を同時に測れる（多重測定）のが最大の利点です。</p>
+      <p>ただしタンパク質のサイズ測定の報告は非常に少数です。ピークの中心で信号が抑えられる「イオンサプレッション」が原因と考えられています。これに対し、解析の際に該当部分を除外する工夫を入れ、半径 0.5〜5 nm のタンパク質で蛍光 TDA の値と非常に良い相関（0.99）を得た研究があります。また、蛍光検出では平均の大きさしか分からなかったタンパク質（コンカナバリン A）で、二量体と四量体の大きさを別々に測れた例も紹介されています。</p>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <p class="stat__value">0.99</p>
+          <p class="stat__label">蛍光 TDA の値との相関（半径 0.5〜5 nm のタンパク質、イオンサプレッション部分を除外して解析）</p>
+        </div>
+        <div class="stat">
+          <p class="stat__value">二量体と四量体</p>
+          <p class="stat__label">コンカナバリン A で大きさを別々に測定（蛍光検出では平均の大きさのみ）</p>
+        </div>
+      </div>
+
+      <p>制約は、質量分析と相性のよい液（酢酸アンモニウムなど）しか使えないことです。逆にこの性質を利用し、TDA を塩を取り除く前処理（オンライン脱塩）として使い、リガンド候補のスクリーニングに応用した研究もあります。ただし対象は中〜高親和性のリガンドに限られます。</p>
+
+      <h3>多重検出：複数の視点を組み合わせる</h3>
+      <p>検出器の使い方には 2 通りの「多重化」があります。</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <p class="card__title"><span class="badge">同種</span> 同じ検出器をキャピラリー上の複数地点に置く</p>
+          <p>注入量や圧力の立ち上がりなどに由来する誤差を取り除け、大きな試料体積を注入する場合は必須とされます。3D プリンティングを使って市販装置に二重蛍光検出を組み込み、フルオレセインで検出限界 600 pM を達成した例があります。ただし励起光源をレーザーから LED に替えると感度が大きく下がったという報告もあります。</p>
+        </div>
+        <div class="card">
+          <p class="card__title"><span class="badge badge--accent-2">異種</span> 種類の違う検出器を組み合わせる</p>
+          <p>互いに独立した情報が同時に得られます。たとえば、UV と蛍光を組み合わせたタンパク質（HSA）の研究では、蛍光では追えない変化を UV が捉え、4 M 尿素でタンパク質がほどけ始める（アンフォールディング）ことを示しました。また UV と蛍光を組み合わせて、脂質ナノ粒子に封入された mRNA の割合と、分解された mRNA の割合を求めた研究もあります。</p>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <p class="stat__value">600 pM</p>
+          <p class="stat__label">二重蛍光検出でのフルオレセインの検出限界</p>
+        </div>
+        <div class="stat">
+          <p class="stat__value">4 M 尿素</p>
+          <p class="stat__label">UV＋蛍光の組み合わせで HSA がほどけ始めることを捉えた条件</p>
+        </div>
+      </div>
+
+      <h3>目的別の使い分け</h3>
+      <p>論文は最後に、検出器と分析目的の対応を表にまとめています。要点は次のとおりです。</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <p class="card__title">UV</p>
+          <p><strong>向いている用途：</strong>標識なしで、純粋なバッファー中のサイズ測定。保管中の医薬品の品質管理</p>
+          <p><strong>主な制約：</strong>選択性がなく、血液中など使用条件での分析はできない</p>
+        </div>
+        <div class="card">
+          <p class="card__title">蛍光</p>
+          <p><strong>向いている用途：</strong>相互作用の研究、血清など複雑な液での測定</p>
+          <p><strong>主な制約：</strong>多くの場合標識が必要で、標識が大きさや性質を変え得る</p>
+        </div>
+        <div class="card">
+          <p class="card__title">ESI-MS</p>
+          <p><strong>向いている用途：</strong>リガンドのスクリーニングなどの基礎研究</p>
+          <p><strong>主な制約：</strong>質量分析と相性のよい溶媒に限られる</p>
+        </div>
+        <div class="card">
+          <p class="card__title">ICP-MS</p>
+          <p><strong>向いている用途：</strong>前処理なしでの生体試料中の分析</p>
+          <p><strong>主な制約：</strong>金属を含む化合物に限られる</p>
+        </div>
+      </div>
+
+      <p>研究の大部分は UV と蛍光が占めているとされます。</p>
+
+      <h2>意義と限界</h2>
+      <p>論文の結論は、<strong>生物医薬品の産業には、製品を実際の使用条件下（たとえば体内の血液の中）で分析する有効な方法がまだない</strong>というものです。強い蛍光をもつ化合物や金属を含む化合物など特定の種類については TDA による解決策が検討されてきましたが、研究はまだ限られています。より複雑な液での分析を可能にするには、さらに大きな努力が必要だとしています。</p>
+      <p>そのうえで著者らは、TDA とさまざまな検出器の組み合わせが、堅牢で選択的な新しい分析法を開き、他の手法では埋められない空白を埋め得ると述べています。展望として、パーキンソン病やアルツハイマー病などで注目される金属の異常な分布について、TDA と ICP-MS を組み合わせて調べられる可能性も挙げています。</p>
+
+      <div class="callout">
+        <span class="callout__icon" aria-hidden="true">!</span>
+        <div class="callout__body">
+          <p>限界・注意点としては、次のものが論文で示されています。</p>
+          <ul>
+            <li>検出器どうしの感度を直接比べるのは難しい。感度は物質の性質や分析条件に加え、物質の大きさにも左右され、その大きさは研究ごとに大きく異なるためです。</li>
+            <li>複数の検出器を同時に使うと、個々の検出法の利点（低濃度や複雑な混合物を測れることなど）が打ち消されることがある。</li>
+            <li>本総説は網羅的ではなく、英語の学術誌論文のみを対象とし、アプリケーションノートは除外している。</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>まとめ</h2>
+      <p>テイラー分散解析（TDA）は、細い管の中で試料が広がる様子から、粒子の液中での大きさを少量・校正不要で測る方法です。この総説は、その弱点である「検出」に注目し、UV・蛍光・質量分析など検出器ごとに何ができて何が苦手かを整理しました。実際の使用条件下での分析はまだ課題として残っており、検出器の組み合わせがその突破口になり得るというのが著者らの見立てです。</p>
+
+    </div>
+
+    <section class="glossary">
+      <h2 class="glossary__title">用語集</h2>
+      <dl>
+        <dt>テイラー分散解析（Taylor Dispersion Analysis, TDA）</dt>
+        <dd>細い管の層流で試料帯が広がる現象（テイラー分散）を利用し、ピーク幅から拡散係数を求めて大きさに換算する手法。</dd>
+        <dt>流体力学的半径（hydrodynamic radius, Rh）</dt>
+        <dd>液中での実効的な大きさ。その拡散係数をもつ球の半径として定義される。</dd>
+        <dt>テイラーグラム（taylorgram）</dt>
+        <dd>TDA で検出されるガウス型（釣り鐘型）のピーク信号。</dd>
+        <dt>ストークス–アインシュタイン式（Stokes–Einstein equation）</dt>
+        <dd>拡散係数と流体力学的半径を結びつける式（D = k_B T/(6πηRh)。k_B はボルツマン定数、T は温度、η は溶媒の粘度）。</dd>
+        <dt>ペクレ数（Péclet number）</dt>
+        <dd>流れによる運搬と拡散の比を表す無次元数。TDA が成り立つ条件の一つに使われる。</dd>
+        <dt>FIDA（Flow-Induced Dispersion Analysis）</dt>
+        <dd>TDA の変法。小さなプローブの見かけの拡散係数の変化から、結合や相互作用を測る。</dd>
+        <dt>フロンタルモード（frontal mode）</dt>
+        <dd>小さな試料帯を注入する通常の方式（プラグ注入）に対し、希釈の影響を避けて感度を上げる注入方式。</dd>
+        <dt>プロテインコロナ（protein corona）</dt>
+        <dd>生体の液中でナノ粒子の表面にまとわりつくタンパク質の層。</dd>
+        <dt>イオンサプレッション（ion suppression）</dt>
+        <dd>ESI-MS で、ピーク中心など成分が濃い部分の信号が抑えられてしまう現象。</dd>
+      </dl>
+    </section>
+
+    <section class="paper-link">
+      <p class="paper-link__label">原論文</p>
+      <p class="paper-link__title">Unlocking the Full Potential of Taylor Dispersion Analysis Through Advanced Detection</p>
+      <p><a href="https://arxiv.org/abs/2610.30039" target="_blank" rel="noopener noreferrer">arXiv:2610.30039 を読む（arxiv.org）</a></p>
+    </section>
+
+    <nav class="article__nav">
+      <a href="../index.html">← 記事一覧へ戻る</a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p>paper-lens — arXiv 論文の日本語解説</p>
+    </div>
+  </footer>
+</body>
+</html>
